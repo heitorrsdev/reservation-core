@@ -9,7 +9,10 @@ check-dev-env:
 
 check-prod-env:
 	@test -f $(PROD_ENV) || (echo "❌ .env.prod não existe" && exit 1)
-	@grep -q "SHADOW_DATABASE_URL" $(PROD_ENV) && (echo "❌ SHADOW_DATABASE_URL NÃO pode existir em prod" && exit 1)
+	@if grep -q "SHADOW_DATABASE_URL" $(PROD_ENV); then \
+		echo "❌ SHADOW_DATABASE_URL NÃO pode existir em prod"; \
+		exit 1; \
+	fi
 
 dev-up: check-dev-env
 	@echo "🚧 Subindo ambiente DEV"
