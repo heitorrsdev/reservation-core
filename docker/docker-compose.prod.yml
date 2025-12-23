@@ -1,16 +1,13 @@
 services:
   postgres:
     image: postgres:16
-    container_name: postgres
-    restart: unless-stopped
+    container_name: reservation-prod-postgres
     environment:
       POSTGRES_DB: reservation_db
       POSTGRES_USER: reservation_app
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-    ports:
-      - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_prod_data:/var/lib/postgresql/data
 
 volumes:
-  postgres_data:
+  postgres_prod_data:
