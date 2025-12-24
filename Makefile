@@ -5,7 +5,7 @@ PROD_ENV=.env.prod
 
 check-dev-env:
 	@test -f $(DEV_ENV) || (echo "❌ .env.dev não existe" && exit 1)
-	@grep -q "SHADOW_DATABASE_URL" $(DEV_ENV) || (echo "❌ SHADOW_DATABASE_URL ausente (.env.dev)" && exit 1)
+	@grep -q "DATABASE_URL" $(DEV_ENV) || (echo "❌ DATABASE_URL ausente (.env.dev)" && exit 1)
 
 check-prod-env:
 	@test -f $(PROD_ENV) || (echo "❌ .env.prod não existe" && exit 1)
@@ -22,8 +22,9 @@ dev-down:
 	@echo "🧹 Derrubando ambiente DEV"
 	docker-compose -f docker/docker-compose.dev.yml down -v
 
-dev-migrate: check-dev-env
+dev-migrate:
 	@echo "🧪 Rodando migrations em DEV"
+	DATABASE_URL="$$(grep DATABASE_URL .env.dev | cut -d '=' -f2-)" \
 	npx prisma migrate dev
 
 prod-up: check-prod-env
