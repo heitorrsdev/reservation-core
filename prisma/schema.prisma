@@ -7,35 +7,51 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  CLIENT
+  BARBER
+  ADMIN
+}
+
 model User {
-  id           String        @id @default(uuid())
-  email        String        @unique
+  id           String   @id @default(uuid())
+  email        String   @unique
   passwordHash String
-  createdAt    DateTime      @default(now())
+  role         UserRole
+  createdAt    DateTime @default(now())
 
   reservations Reservation[]
+
+  @@index([role])
 }
 
-model Resource {
-  id          String        @id @default(uuid())
-  name        String
-  description String?
-  createdAt   DateTime      @default(now())
+
+model Barber {
+  id        String   @id @default(uuid())
+  name      String
+  bio       String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
 
   reservations Reservation[]
+
+  @@index([active])
 }
+
 
 model Reservation {
-  id         String   @id @default(uuid())
-  startTime  DateTime
-  endTime    DateTime
-  createdAt  DateTime @default(now())
+  id        String   @id @default(uuid())
+  startTime DateTime
+  endTime   DateTime
+  period    Unsupported("tstzrange")
+  
+  createdAt DateTime @default(now())
 
-  userId     String
-  resourceId String
+  userId    String
+  barberId  String
 
-  user       User     @relation(fields: [userId], references: [id])
-  resource   Resource @relation(fields: [resourceId], references: [id])
+  user      User   @relation(fields: [userId], references: [id])
+  barber    Barber @relation(fields: [barberId], references: [id])
 
-  @@index([resourceId, startTime, endTime])
+  @@index([barberId])
 }
