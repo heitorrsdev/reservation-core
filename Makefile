@@ -34,3 +34,7 @@ prod-up: check-prod-env
 prod-migrate: check-prod-env
 	@echo "📦 Aplicando migrations em PROD"
 	npx prisma migrate deploy
+
+tree:
+	@echo "🌳 Estrutura de pastas do projeto"
+	tree -I "node_modules|.git|dist|*.env*|docker"
