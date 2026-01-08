@@ -1,8 +1,6 @@
-.PHONY: \
-	dev-up dev-down dev-migrate \
-	prod-up prod-migrate \
-	check-dev-env check-prod-env \
-	tree
+# ─────────────────────────────────────────────────────────────
+# Variáveis de ambiente
+# ─────────────────────────────────────────────────────────────
 
 DEV_ENV  = .env.dev
 PROD_ENV = .env.prod
@@ -12,7 +10,20 @@ PROD_COMPOSE = docker/docker-compose.prod.yml
 
 TREE_IGNORE = node_modules|.git|dist|*.env*|docker
 
-## ───── Checks ─────
+
+# ─────────────────────────────────────────────────────────────
+# Phony targets
+# ─────────────────────────────────────────────────────────────
+
+.PHONY: dev-up dev-down dev-migrate \
+        prod-up prod-migrate \
+        check-dev-env check-prod-env \
+        tree
+
+
+# ─────────────────────────────────────────────────────────────
+# Checks
+# ─────────────────────────────────────────────────────────────
 
 check-dev-env:
 	@test -f $(DEV_ENV) || (echo "❌ .env.dev não existe" && exit 1)
@@ -26,7 +37,10 @@ check-prod-env:
 		exit 1; \
 	fi
 
-## ───── DEV ─────
+
+# ─────────────────────────────────────────────────────────────
+# DEV
+# ─────────────────────────────────────────────────────────────
 
 dev-up: check-dev-env
 	@echo "🚧 Subindo ambiente DEV"
@@ -38,10 +52,16 @@ dev-down:
 
 dev-migrate: check-dev-env
 	@echo "🧪 Rodando migrations em DEV"
-	@export $$(grep -E '^[A-Z_]+=' $(DEV_ENV) | xargs) && \
-	npx prisma migrate dev
+	@npx dotenv -e $(DEV_ENV) -- sh -c "\
+		npx prisma validate && \
+		npx prisma migrate dev && \
+		npx prisma generate \
+	"
 
-## ───── PROD ─────
+
+# ─────────────────────────────────────────────────────────────
+# PROD
+# ─────────────────────────────────────────────────────────────
 
 prod-up: check-prod-env
 	@echo "🚀 Subindo ambiente PROD"
@@ -49,9 +69,12 @@ prod-up: check-prod-env
 
 prod-migrate: check-prod-env
 	@echo "📦 Aplicando migrations em PROD"
-	@npx prisma migrate deploy
+	@npx dotenv -e $(PROD_ENV) -- npx prisma migrate deploy
 
-## ───── Utils ─────
+
+# ─────────────────────────────────────────────────────────────
+# Utils
+# ─────────────────────────────────────────────────────────────
 
 tree:
 	@echo "🌳 Estrutura de pastas do projeto"
