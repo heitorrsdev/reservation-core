@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────────
-# Variáveis de ambiente
+# Variáveis
 # ─────────────────────────────────────────────────────────────
 
 DEV_ENV  = .env.dev
@@ -15,7 +15,8 @@ TREE_IGNORE = node_modules|.git|dist|*.env*|docker
 # Phony targets
 # ─────────────────────────────────────────────────────────────
 
-.PHONY: dev-up dev-down dev-migrate \
+.PHONY: dev-up dev-down \
+        dev-migrate-create dev-migrate-apply \
         prod-up prod-migrate \
         check-dev-env check-prod-env \
         tree
@@ -43,20 +44,24 @@ check-prod-env:
 # ─────────────────────────────────────────────────────────────
 
 dev-up: check-dev-env
-	@echo "🚧 Subindo ambiente DEV"
-	@docker-compose -f $(DEV_COMPOSE) --env-file $(DEV_ENV) up -d
+	@echo "🚧 Subindo Postgres DEV"
+	@docker-compose -f $(DEV_COMPOSE) up -d
 
 dev-down:
-	@echo "🧹 Derrubando ambiente DEV"
+	@echo "🧹 Derrubando Postgres DEV"
 	@docker-compose -f $(DEV_COMPOSE) down -v
 
-dev-migrate: check-dev-env
-	@echo "🧪 Rodando migrations em DEV"
-	@npx dotenv -e $(DEV_ENV) -- sh -c "\
-		npx prisma validate && \
-		npx prisma migrate dev && \
-		npx prisma generate \
-	"
+dev-migrate-create: check-dev-env
+	@echo "📝 Gerando migration (DEV)"
+	@npx dotenv -e $(DEV_ENV) -- \
+		npx prisma migrate dev --create-only
+
+dev-migrate-apply: check-dev-env
+	@echo "🧪 Aplicando migrations no banco DEV"
+	@npx dotenv -e $(DEV_ENV) -- \
+		npx prisma migrate deploy
+	@npx dotenv -e $(DEV_ENV) -- \
+		npx prisma generate
 
 
 # ─────────────────────────────────────────────────────────────
@@ -64,8 +69,8 @@ dev-migrate: check-dev-env
 # ─────────────────────────────────────────────────────────────
 
 prod-up: check-prod-env
-	@echo "🚀 Subindo ambiente PROD"
-	@docker-compose -f $(PROD_COMPOSE) --env-file $(PROD_ENV) up -d
+	@echo "🚀 Subindo Postgres PROD"
+	@docker-compose -f $(PROD_COMPOSE) up -d
 
 prod-migrate: check-prod-env
 	@echo "📦 Aplicando migrations em PROD"
