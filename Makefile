@@ -12,14 +12,17 @@ TREE_IGNORE = node_modules|.git|dist|*.env*|docker
 
 
 # ─────────────────────────────────────────────────────────────
-# Phony targets
+# Phony
 # ─────────────────────────────────────────────────────────────
 
-.PHONY: dev-up dev-down \
-        dev-migrate-create dev-migrate-apply \
-        prod-up prod-migrate \
-        check-dev-env check-prod-env \
-        tree
+.PHONY: \
+	dev-up dev-down \
+	dev-migrate-create dev-migrate-apply \
+	prod-up prod-migrate \
+	check-dev-env check-prod-env \
+	prisma-validate prisma-migrate-apply prisma-generate \
+	lint typecheck test \
+	tree
 
 
 # ─────────────────────────────────────────────────────────────
@@ -40,28 +43,51 @@ check-prod-env:
 
 
 # ─────────────────────────────────────────────────────────────
+# Targets neutros (CI-safe)
+# ─────────────────────────────────────────────────────────────
+
+lint:
+	pnpm lint
+
+typecheck:
+	pnpm tsc --noEmit
+
+test:
+	pnpm test
+
+prisma-validate:
+	npx prisma validate
+
+prisma-migrate-apply:
+	npx prisma migrate deploy
+
+prisma-generate:
+	npx prisma generate
+
+
+# ─────────────────────────────────────────────────────────────
 # DEV
 # ─────────────────────────────────────────────────────────────
 
 dev-up: check-dev-env
 	@echo "🚧 Subindo Postgres DEV"
-	@docker-compose -f $(DEV_COMPOSE) up -d
+	docker-compose -f $(DEV_COMPOSE) up -d
 
 dev-down:
 	@echo "🧹 Derrubando Postgres DEV"
-	@docker-compose -f $(DEV_COMPOSE) down -v
+	docker-compose -f $(DEV_COMPOSE) down -v
 
 dev-migrate-create: check-dev-env
 	@echo "📝 Gerando migration (DEV)"
-	@npx dotenv -e $(DEV_ENV) -- \
+	npx dotenv -e $(DEV_ENV) -- \
 		npx prisma migrate dev --create-only
 
 dev-migrate-apply: check-dev-env
 	@echo "🧪 Aplicando migrations no banco DEV"
-	@npx dotenv -e $(DEV_ENV) -- \
-		npx prisma migrate deploy
-	@npx dotenv -e $(DEV_ENV) -- \
-		npx prisma generate
+	npx dotenv -e $(DEV_ENV) -- \
+		$(MAKE) prisma-migrate-apply
+	npx dotenv -e $(DEV_ENV) -- \
+		$(MAKE) prisma-generate
 
 
 # ─────────────────────────────────────────────────────────────
@@ -70,11 +96,12 @@ dev-migrate-apply: check-dev-env
 
 prod-up: check-prod-env
 	@echo "🚀 Subindo Postgres PROD"
-	@docker-compose -f $(PROD_COMPOSE) up -d
+	docker-compose -f $(PROD_COMPOSE) up -d
 
 prod-migrate: check-prod-env
 	@echo "📦 Aplicando migrations em PROD"
-	@npx dotenv -e $(PROD_ENV) -- npx prisma migrate deploy
+	npx dotenv -e $(PROD_ENV) -- \
+		$(MAKE) prisma-migrate-apply
 
 
 # ─────────────────────────────────────────────────────────────
@@ -82,5 +109,5 @@ prod-migrate: check-prod-env
 # ─────────────────────────────────────────────────────────────
 
 tree:
-	@echo "🌳 Estrutura de pastas do projeto"
-	@tree -L 6 -I "$(TREE_IGNORE)"
+	@echo "🌳 Estrutura de pastas"
+	tree -L 6 -I "$(TREE_IGNORE)"
