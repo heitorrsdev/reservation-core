@@ -71,11 +71,11 @@ prisma-generate:
 
 dev-up: check-dev-env
 	@echo "🚧 Subindo Postgres DEV"
-	docker-compose -f $(DEV_COMPOSE) up -d
+	docker compose -f $(DEV_COMPOSE) up -d
 
 dev-down:
 	@echo "🧹 Derrubando Postgres DEV"
-	docker-compose -f $(DEV_COMPOSE) down -v
+	docker compose -f $(DEV_COMPOSE) down -v
 
 dev-migrate-create: check-dev-env
 	@echo "📝 Gerando migration (DEV)"
@@ -96,7 +96,7 @@ dev-migrate-apply: check-dev-env
 
 prod-up: check-prod-env
 	@echo "🚀 Subindo Postgres PROD"
-	docker-compose -f $(PROD_COMPOSE) up -d
+	docker compose -f $(PROD_COMPOSE) up -d
 
 prod-migrate: check-prod-env
 	@echo "📦 Aplicando migrations em PROD"
