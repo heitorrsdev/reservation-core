@@ -79,14 +79,14 @@ dev-down:
 
 dev-migrate-create: check-dev-env
 	@echo "📝 Gerando migration (DEV)"
-	npx dotenv -e $(DEV_ENV) -- \
+	npx dotenv-cli -e $(DEV_ENV) -- \
 		npx prisma migrate dev --create-only
 
 dev-migrate-apply: check-dev-env
 	@echo "🧪 Aplicando migrations no banco DEV"
-	npx dotenv -e $(DEV_ENV) -- \
+	npx dotenv-cli -e $(DEV_ENV) -- \
 		$(MAKE) prisma-migrate-apply
-	npx dotenv -e $(DEV_ENV) -- \
+	npx dotenv-cli -e $(DEV_ENV) -- \
 		$(MAKE) prisma-generate
 
 
@@ -100,7 +100,7 @@ prod-up: check-prod-env
 
 prod-migrate: check-prod-env
 	@echo "📦 Aplicando migrations em PROD"
-	npx dotenv -e $(PROD_ENV) -- \
+	npx dotenv-cli -e $(PROD_ENV) -- \
 		$(MAKE) prisma-migrate-apply
 
 
