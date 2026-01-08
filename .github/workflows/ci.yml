@@ -39,15 +39,19 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - run: pnpm lint
-      - run: pnpm tsc --noEmit
+      - name: Lint
+        run: make lint
+
+      - name: Typecheck
+        run: make typecheck
 
       - name: Prisma validate
-        run: npx prisma validate
+        run: make prisma-validate
 
       - name: Apply migrations
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/reservation_db
-        run: npx prisma migrate deploy
+        run: make prisma-migrate-apply
 
-      - run: pnpm test
+      - name: Tests
+        run: make test
