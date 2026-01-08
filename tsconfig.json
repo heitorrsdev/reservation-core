@@ -9,8 +9,8 @@
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
     "isolatedModules": true,
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "module": "commonjs",
+    "moduleResolution": "node",
     "noFallthroughCasesInSwitch": false,
     "noImplicitAny": false,
     "outDir": "./dist",
@@ -21,7 +21,6 @@
       "@http/*": ["src/http/*"]
     },
     "removeComments": true,
-    "resolvePackageJsonExports": true,
     "skipLibCheck": true,
     "sourceMap": true,
     "strictBindCallApply": false,
