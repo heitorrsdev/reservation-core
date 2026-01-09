@@ -1,98 +1,109 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Reservation Core — Barber Shop Booking System
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Núcleo de reservas para barbearia, desenvolvida como **projeto pessoal com padrão profissional**, focado em **boas práticas de arquitetura, domínio e modelagem de dados**.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+O projeto serve como **repertório técnico** para posições de **Node.js Developer (Pleno)**, priorizando clareza arquitetural, decisões explícitas e coerência entre código, domínio e persistência.
 
-## Description
+---
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Visão Geral
 
-## Project setup
+O sistema permite que clientes realizem reservas com barbeiros, tratando conflitos de horário diretamente no banco de dados e mantendo as regras de negócio explícitas no domínio.
 
-```bash
-$ pnpm install
+Principais características:
+
+* Arquitetura em camadas
+* Domínio isolado de frameworks
+* Regras críticas garantidas via constraints no banco
+* Documentação de decisões arquiteturais (ADR)
+* Uso de SQL como fonte de verdade para integridade de dados
+
+---
+
+## Stack Tecnológica
+
+* **Node.js**
+* **NestJS** (usado como camada de aplicação)
+* **PostgreSQL**
+* **Prisma** *(em transição para Drizzle ORM)*
+* **TypeScript**
+* **pnpm**
+* **Jest** (testes E2E)
+
+> ⚠️ **Nota:** O projeto está em transição de **Prisma para Drizzle ORM** para suportar uso intensivo de SQL avançado e maior controle sobre migrations e queries.
+
+---
+
+## Arquitetura
+
+A aplicação segue uma **arquitetura em camadas**, com separação clara de responsabilidades:
+
+```
+src/
+├── domain          # Entidades, erros e contratos (regras de negócio puras)
+├── application     # Casos de uso e orquestração do domínio
+├── infrastructure  # Implementações técnicas (ORM, banco, frameworks)
 ```
 
-## Compile and run the project
+* O **domínio** não depende de frameworks ou bibliotecas externas
+* A **infraestrutura** implementa contratos definidos pelo domínio
+* Regras críticas de integridade são garantidas no **nível do banco de dados**
 
-```bash
-# development
-$ pnpm run start
 
-# watch mode
-$ pnpm run start:dev
+Decisões arquiteturais estão documentadas em **Architecture Decision Records (ADR)**.
 
-# production mode
-$ pnpm run start:prod
-```
+📄 Veja: [`docs/adr`](./docs/adr)
 
-## Run tests
+---
 
-```bash
-# unit tests
-$ pnpm run test
+## Casos de Uso
 
-# e2e tests
-$ pnpm run test:e2e
+Os principais fluxos de negócio estão documentados de forma explícita:
 
-# test coverage
-$ pnpm run test:cov
-```
+* Criar reserva
+* Cancelar reserva
+* Listar agenda do barbeiro
+* Listar reservas do cliente
 
-## Deployment
+📄 Veja: [`docs/use-cases.md`](./docs/use-cases.md)
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+---
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## Estado Atual do Projeto
 
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
+* ✅ Criação de reservas com validações de domínio
+* ✅ Conflitos tratados via constraint no banco
+* ⚠️ Cancelamento definido no domínio, persistência em implementação
+* ⚠️ Migração de ORM em andamento (Prisma → Drizzle)
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Este repositório **prioriza correção arquitetural e clareza de decisões**, não velocidade de entrega.
 
-## Resources
+---
 
-Check out a few resources that may come in handy when working with NestJS:
+## Documentação
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+* **ADRs:** decisões arquiteturais e seus trade-offs
+  📄 [`docs/adr`](./docs/adr)
 
-## Support
+* **Casos de Uso:** regras de negócio e fluxos principais
+  📄 [`docs/use-cases.md`](./docs/use-cases.md)
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+---
 
-## Stay in touch
+## Objetivo do Projeto
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Este projeto não é um tutorial nem um MVP comercial.
 
-## License
+Ele existe para demonstrar:
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+* pensamento arquitetural
+* domínio de Node.js e TypeScript
+* modelagem correta de regras de negócio
+* uso consciente de banco de dados relacional
+* capacidade de justificar decisões técnicas
+
+---
+
+## Licença
+
+Este projeto está licenciado sob a [Licença MIT](LICENSE). Veja o arquivo `LICENSE` para mais detalhes.
