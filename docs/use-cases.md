@@ -1,7 +1,7 @@
 # Use Cases — Sistema de Reservas
 
 Este documento define os **casos de uso essenciais** do sistema.
-Ele é a fonte de verdade para regras de negócio que impactam schema, queries e validações.
+Ele descreve as regras de negócio esperadas que impactam schema, queries e validações.
 
 ---
 
@@ -19,9 +19,13 @@ Ele é a fonte de verdade para regras de negócio que impactam schema, queries e
 5. Reserva é criada com sucesso
 
 ### Regras de negócio
+- `startTime` deve ser anterior a `endTime`
+- O intervalo deve representar um horário válido de reserva
+- O barbeiro deve estar ativo
 - O sistema **não consulta previamente** disponibilidade
-- Conflitos são tratados via **constraint no banco**
-- Violação de constraint resulta em erro de negócio
+- Conflitos de horário são tratados via **constraint no banco**
+- Violação de constraint resulta em **erro de conflito de reserva**
+
 
 ---
 
@@ -38,7 +42,8 @@ Ele é a fonte de verdade para regras de negócio que impactam schema, queries e
 
 ### Observações
 - Reserva **não é deletada**
-- Mesmo sem campo de status implementado, o caso de uso existe
+- Este caso de uso está definido no domínio, mas sua persistência (status/cancelamento) ainda não está implementada
+
 
 ---
 
@@ -51,6 +56,10 @@ Ele é a fonte de verdade para regras de negócio que impactam schema, queries e
 2. Retorna reservas do barbeiro no período
 3. Resultado ordenado por `startTime`
 
+### Decisões pendentes
+- Inclusão de reservas canceladas
+- Política de visibilidade por período
+
 ---
 
 ## UC-04 — Listar Reservas do Cliente
@@ -61,3 +70,10 @@ Ele é a fonte de verdade para regras de negócio que impactam schema, queries e
 1. Retorna reservas do cliente
 2. Resultado paginado
 3. Ordenado por data
+
+### Decisões pendentes
+- Inclusão de reservas canceladas
+- Política de visibilidade de reservas passadas
+
+### Observações
+- Datas e horários são tratados em UTC
