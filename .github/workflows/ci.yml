@@ -44,5 +44,12 @@ jobs:
       - name: Typecheck
         run: make typecheck
 
+      - name: Apply Drizzle migrations
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/reservation_db
+        run: make dev-migrate
+
       - name: Tests
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/reservation_db
         run: make test

@@ -8,6 +8,7 @@ PROD_ENV = .env.prod
 DEV_COMPOSE  = docker/docker-compose.dev.yml
 PROD_COMPOSE = docker/docker-compose.prod.yml
 
+MIGRATIONS_DIR = migrations
 TREE_IGNORE = node_modules|.git|dist|*.env*
 
 
@@ -64,6 +65,10 @@ dev-down:
 	@echo "🧹 Derrubando Postgres DEV"
 	docker compose -f $(DEV_COMPOSE) down -v
 
+dev-migrate:
+	npx dotenv-cli -e $(DEV_ENV) -- \
+		npx ts-node src/scripts/migrate.ts
+
 
 # ─────────────────────────────────────────────────────────────
 # PROD
@@ -72,6 +77,10 @@ dev-down:
 prod-up: check-prod-env
 	@echo "🚀 Subindo Postgres PROD"
 	docker compose -f $(PROD_COMPOSE) up -d
+
+prod-migrate: check-prod-env
+	npx dotenv-cli -e $(PROD_ENV) -- \
+		npx ts-node src/scripts/migrate.ts
 
 
 # ─────────────────────────────────────────────────────────────
