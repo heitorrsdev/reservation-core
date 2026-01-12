@@ -17,10 +17,8 @@ TREE_IGNORE = node_modules|.git|dist|*.env*
 
 .PHONY: \
 	dev-up dev-down \
-	dev-migrate-create dev-migrate-apply \
-	prod-up prod-migrate \
+	dev-migrate-apply prod-migrate \
 	check-dev-env check-prod-env \
-	prisma-validate prisma-migrate-apply prisma-generate \
 	lint typecheck test \
 	tree
 
@@ -36,14 +34,12 @@ check-dev-env:
 
 check-prod-env:
 	@test -f $(PROD_ENV) || (echo "❌ .env.prod não existe" && exit 1)
-	@if grep -q "^SHADOW_DATABASE_URL=" $(PROD_ENV); then \
-		echo "❌ SHADOW_DATABASE_URL NÃO pode existir em prod"; \
-		exit 1; \
-	fi
+	@grep -q "^DATABASE_URL=" $(PROD_ENV) || \
+		(echo "❌ DATABASE_URL ausente (.env.prod)" && exit 1)
 
 
 # ─────────────────────────────────────────────────────────────
-# Targets neutros (CI-safe)
+# Qualidade (CI-safe)
 # ─────────────────────────────────────────────────────────────
 
 lint:
@@ -54,15 +50,6 @@ typecheck:
 
 test:
 	pnpm test
-
-prisma-validate:
-	npx prisma validate
-
-prisma-migrate-apply:
-	npx prisma migrate deploy
-
-prisma-generate:
-	npx prisma generate
 
 
 # ─────────────────────────────────────────────────────────────
@@ -77,18 +64,6 @@ dev-down:
 	@echo "🧹 Derrubando Postgres DEV"
 	docker compose -f $(DEV_COMPOSE) down -v
 
-dev-migrate-create: check-dev-env
-	@echo "📝 Gerando migration (DEV)"
-	npx dotenv-cli -e $(DEV_ENV) -- \
-		npx prisma migrate dev --create-only
-
-dev-migrate-apply: check-dev-env
-	@echo "🧪 Aplicando migrations no banco DEV"
-	npx dotenv-cli -e $(DEV_ENV) -- \
-		$(MAKE) prisma-migrate-apply
-	npx dotenv-cli -e $(DEV_ENV) -- \
-		$(MAKE) prisma-generate
-
 
 # ─────────────────────────────────────────────────────────────
 # PROD
@@ -97,11 +72,6 @@ dev-migrate-apply: check-dev-env
 prod-up: check-prod-env
 	@echo "🚀 Subindo Postgres PROD"
 	docker compose -f $(PROD_COMPOSE) up -d
-
-prod-migrate: check-prod-env
-	@echo "📦 Aplicando migrations em PROD"
-	npx dotenv-cli -e $(PROD_ENV) -- \
-		$(MAKE) prisma-migrate-apply
 
 
 # ─────────────────────────────────────────────────────────────
