@@ -8,7 +8,7 @@ PROD_ENV = .env.prod
 DEV_COMPOSE  = docker/docker-compose.dev.yml
 PROD_COMPOSE = docker/docker-compose.prod.yml
 
-TREE_IGNORE = node_modules|.git|dist|*.env*|docker
+TREE_IGNORE = node_modules|.git|dist|*.env*
 
 
 # ─────────────────────────────────────────────────────────────
