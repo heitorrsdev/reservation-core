@@ -110,4 +110,4 @@ prod-migrate: check-prod-env
 
 tree:
 	@echo "🌳 Estrutura de pastas"
-	tree -L 6 -I "$(TREE_IGNORE)"
+	tree -a -L 6 -I "$(TREE_IGNORE)" --prune
