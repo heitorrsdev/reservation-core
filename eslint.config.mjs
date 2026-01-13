@@ -46,46 +46,24 @@ export default tseslint.config(
         'error',
         {
           groups: [
-            // Node.js built-ins
             ['^node:'],
-
-            // External packages
             ['^@?\\w'],
-
-            // Domain
             ['^@domain/'],
-
-            // Application
             ['^@application/'],
-
-            // Infrastructure
             ['^@infrastructure/'],
-
-            // HTTP
             ['^@http/'],
-
-            // Relative imports
             ['^\\.'],
-
-            // Side effect imports
             ['^\\u0000'],
           ],
         },
       ],
       'simple-import-sort/exports': 'error',
-      'no-restricted-imports': [
-        'error',
-        {
-          patterns: [
-            {
-              group: ['@http/*', '@infrastructure/*', '@application/*'],
-              message: 'Domain layer must not depend on outer layers',
-            },
-          ],
-        },
-      ],
     },
   },
+
+  // =====================
+  // Domain
+  // =====================
   {
     files: ['src/domain/**/*.{ts,tsx}'],
     rules: {
@@ -101,24 +79,37 @@ export default tseslint.config(
       ],
     },
   },
+
+  // =====================
+  // Application
+  // =====================
   {
     files: ['src/application/**/*.{ts,tsx}'],
     rules: {
       'no-restricted-imports': [
         'error',
         {
-          patterns: ['@infrastructure/*', '@http/*'],
+          patterns: [
+            '@infrastructure/*',
+            '@http/*',
+          ],
         },
       ],
     },
   },
+
+  // =====================
+  // HTTP
+  // =====================
   {
     files: ['src/http/**/*.{ts,tsx}'],
     rules: {
       'no-restricted-imports': [
         'error',
         {
-          patterns: ['@domain/*'],
+          patterns: [
+            '@infrastructure/*',
+          ],
         },
       ],
     },
