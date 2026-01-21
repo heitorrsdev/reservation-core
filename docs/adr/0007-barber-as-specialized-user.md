@@ -1,9 +1,5 @@
    # ADR 0007 – User como Identidade, Barber como Especialização (Shared Primary Key)
 
-   ## Status
-
-   Proposto
-
    ## Contexto
 
    O sistema precisa lidar com reservas entre clientes e barbeiros. O modelo inicial tentou representar isso usando:
