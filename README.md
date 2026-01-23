@@ -1,98 +1,159 @@
 # Reservation Core — Barber Shop Booking System
 
-Núcleo de reservas para barbearia, desenvolvida como **projeto pessoal com padrão profissional**, focado em **boas práticas de arquitetura, domínio e modelagem de dados**.
+Núcleo de reservas para barbearia, desenvolvido como **projeto de portfólio com padrão profissional**, focado em **arquitetura, domínio rico e modelagem correta de dados**.
 
-O projeto serve como **repertório técnico** para posições de **Node.js Developer (Pleno)**, priorizando clareza arquitetural, decisões explícitas e coerência entre código, domínio e persistência.
+Este projeto serve como **repertório técnico** para posições de **Node.js Developer (Pleno)**, priorizando:
+
+* clareza arquitetural
+* decisões explícitas e documentadas
+* coerência entre domínio, aplicação e persistência
 
 ---
 
 ## Visão Geral
 
-O sistema permite que clientes realizem reservas com barbeiros, tratando conflitos de horário diretamente no banco de dados e mantendo as regras de negócio explícitas no domínio.
+O sistema permite que usuários realizem **reservas com barbeiros**, tratando **conflitos de horário diretamente no banco de dados** e mantendo as **regras de negócio explícitas no domínio**.
+
+Não se trata de um CRUD genérico:
+o foco está em **consistência, invariantes e integridade**.
 
 Principais características:
 
-* Arquitetura em camadas
+* Arquitetura em camadas (Clean Architecture)
 * Domínio isolado de frameworks
-* Regras críticas garantidas via constraints no banco
-* Documentação de decisões arquiteturais (ADR)
-* Uso de SQL como fonte de verdade para integridade de dados
+* Identidade centralizada em `User`
+* `Barber` modelado como **especialização de usuário**
+* Regras críticas garantidas via **constraints no banco**
+* SQL como fonte de verdade
+* Decisões arquiteturais documentadas (ADR)
 
 ---
 
 ## Stack Tecnológica
 
 * **Node.js**
-* **NestJS** (usado como camada de aplicação)
+* **NestJS** (como camada de aplicação / composição)
 * **PostgreSQL**
-* **Prisma** *(em transição para Drizzle ORM)*
+* **Drizzle ORM** (SQL-first)
 * **TypeScript**
 * **pnpm**
 * **Jest** (testes E2E)
 
-> ⚠️ **Nota:** O projeto está em transição de **Prisma para Drizzle ORM** para suportar uso intensivo de SQL avançado e maior controle sobre migrations e queries.
+> ℹ️ **Nota:** O projeto adotou uma estratégia **SQL-first**, utilizando Drizzle apenas como camada de infraestrutura.
+> Migrations são escritas manualmente em SQL para garantir controle total sobre integridade e constraints.
 
 ---
 
 ## Arquitetura
 
-A aplicação segue uma **arquitetura em camadas**, com separação clara de responsabilidades:
+A aplicação segue uma **arquitetura em camadas com dependências unidirecionais**:
 
 ```
 src/
-├── domain          # Entidades, erros e contratos (regras de negócio puras)
+├── domain          # Entidades, VOs, erros e contratos (regras puras)
 ├── application     # Casos de uso e orquestração do domínio
-├── infrastructure  # Implementações técnicas (ORM, banco, frameworks)
+├── infrastructure  # ORM, banco, framework e detalhes técnicos
 ```
 
-* O **domínio** não depende de frameworks ou bibliotecas externas
-* A **infraestrutura** implementa contratos definidos pelo domínio
-* Regras críticas de integridade são garantidas no **nível do banco de dados**
+Princípios adotados:
 
+* O **domínio não depende** de frameworks ou bibliotecas externas
+* A **application** depende apenas do domínio
+* A **infraestrutura implementa contratos**, nunca regras
+* Invariantes críticas são reforçadas **no domínio e no banco**
 
-Decisões arquiteturais estão documentadas em **Architecture Decision Records (ADR)**.
+O enforcement dessa arquitetura é feito via **ESLint**.
 
-📄 Veja: [`docs/adr`](./docs/adr)
+📄 Decisões detalhadas em: [`docs/adr`](./docs/adr)
+
+---
+
+## Modelo de Domínio (Visão Conceitual)
+
+* **User**
+
+  * Entidade base de identidade
+  * Possui email e password hash validados no domínio
+
+* **Barber**
+
+  * Especialização de `User`
+  * Compartilha a mesma identidade (chave primária)
+  * Não existe como entidade independente
+
+* **Cliente**
+
+  * Não é uma entidade
+  * Representa um `User` que cria reservas
+
+Essa decisão está documentada em ADR e refletida no schema e no código.
 
 ---
 
 ## Casos de Uso
 
-Os principais fluxos de negócio estão documentados de forma explícita:
+Os casos de uso são a **fonte de verdade funcional** do sistema.
 
+Atualmente definidos:
+
+* Criar usuário
+* Criar barbeiro (especialização de usuário)
 * Criar reserva
 * Cancelar reserva
 * Listar agenda do barbeiro
 * Listar reservas do cliente
 
-📄 Veja: [`docs/use-cases.md`](./docs/use-cases.md)
+📄 Consulte: [`docs/use-cases.md`](./docs/use-cases.md)
+
+---
+
+## Banco de Dados e Integridade
+
+* PostgreSQL como banco principal
+* Migrations escritas em **SQL puro**
+* Constraints utilizadas para:
+
+  * evitar conflitos de horário
+  * garantir integridade relacional
+* O sistema **não pré-consulta disponibilidade**
+
+  * conflitos são detectados pelo banco
+  * violação resulta em erro de domínio
+
+Essa abordagem reduz race conditions e simplifica a lógica de aplicação.
 
 ---
 
 ## Estado Atual do Projeto
 
+* ✅ Entidades de domínio (`User`, `Barber`, `Reservation`)
+* ✅ Casos de uso principais definidos
 * ✅ Criação de reservas com validações de domínio
 * ✅ Conflitos tratados via constraint no banco
-* ⚠️ Cancelamento definido no domínio, persistência em implementação
-* ⚠️ Migração de ORM em andamento (Prisma → Drizzle)
+* ⚠️ Persistência de cancelamento de reserva em evolução
+* ⚠️ Infra de `User` e `Barber` em implementação
 
-Este repositório **prioriza correção arquitetural e clareza de decisões**, não velocidade de entrega.
+O projeto **prioriza correção arquitetural**, não velocidade.
 
 ---
 
 ## Documentação
 
-* **ADRs:** decisões arquiteturais e seus trade-offs
+* **ADRs** — decisões arquiteturais e trade-offs
   📄 [`docs/adr`](./docs/adr)
 
-* **Casos de Uso:** regras de negócio e fluxos principais
+* **Casos de Uso** — regras de negócio e fluxos principais
   📄 [`docs/use-cases.md`](./docs/use-cases.md)
 
 ---
 
 ## Objetivo do Projeto
 
-Este projeto não é um tutorial nem um MVP comercial.
+Este projeto **não é**:
+
+* um tutorial
+* um MVP comercial
+* um boilerplate
 
 Ele existe para demonstrar:
 
@@ -106,4 +167,4 @@ Ele existe para demonstrar:
 
 ## Licença
 
-Este projeto está licenciado sob a [Licença MIT](LICENSE). Veja o arquivo `LICENSE` para mais detalhes.
+Este projeto está licenciado sob a [Licença MIT](LICENSE).
