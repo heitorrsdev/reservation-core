@@ -1,7 +1,7 @@
 import { Barber } from '@domain/barber/barber.entity';
 import { BarberRepository } from '@domain/barber/barber.repository';
 import { UserAlreadyBarber } from '@domain/barber/errors/user-already-barber.error';
-import { UserNotFound } from '@domain/user/errors/user-not-found.error';
+import { UserNotFoundError } from '@domain/user/errors/user-not-found.error';
 import { UserRepository } from '@domain/user/user.repository';
 
 import { CreateBarberCommand } from './create-barber.command';
@@ -15,7 +15,7 @@ export class CreateBarberUseCase {
   async execute(command: CreateBarberCommand): Promise<void> {
     const userExists = await this.userRepository.findById(command.userId);
     if (!userExists) {
-      throw new UserNotFound(command.userId);
+      throw new UserNotFoundError(command.userId);
     }
 
     const barberExists = await this.barberRepository.findById(command.userId);
