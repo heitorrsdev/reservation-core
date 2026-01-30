@@ -61,8 +61,20 @@ dev-up: check-dev-env
 	@echo "🚧 Subindo Postgres DEV"
 	docker compose -f $(DEV_COMPOSE) up -d
 
+dev-stop:
+	@echo "⏹️ Parando containers DEV"
+	docker compose -f $(DEV_COMPOSE) stop
+
+dev-start:
+	@echo "▶️ Iniciando containers DEV"
+	docker compose -f $(DEV_COMPOSE) start
+
 dev-down:
-	@echo "🧹 Derrubando Postgres DEV"
+	@echo "⬇️ Removendo containers DEV (mantendo volumes)"
+	docker compose -f $(DEV_COMPOSE) down
+
+dev-reset:
+	@echo "💥 Resetando ambiente DEV (containers + volumes)"
 	docker compose -f $(DEV_COMPOSE) down -v
 
 dev-migrate:

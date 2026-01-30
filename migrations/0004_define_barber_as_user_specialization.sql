@@ -1,0 +1,5 @@
+ALTER TABLE barbers
+ADD CONSTRAINT barbers_user_fk
+FOREIGN KEY (id)
+REFERENCES users(id)
+ON DELETE CASCADE;
