@@ -1,33 +1,31 @@
 # Architecture Decision Records (ADR)
 
-Este diretório contém os **Architecture Decision Records (ADRs)** do projeto.
+This directory contains the **Architecture Decision Records (ADRs)** of the project.
 
-ADRs documentam **decisões arquiteturais relevantes**, o contexto em que foram tomadas, as alternativas consideradas e suas consequências.
-O objetivo é tornar explícito **o raciocínio técnico por trás da arquitetura**, facilitando manutenção, evolução e avaliação técnica do projeto.
+ADRs document **relevant architectural decisions**, the context in which they were made, the alternatives considered, and their consequences.
+The goal is to make the **technical reasoning behind the architecture** explicit, facilitating maintenance, evolution, and technical evaluation of the project.
 
-## O que é um ADR
+## What is an ADR
 
-Um ADR registra:
+An ADR records:
 
-* **Contexto**: o problema ou necessidade arquitetural
-* **Decisão**: a escolha feita
-* **Consequências**: impactos positivos e negativos
-* **Alternativas consideradas** (quando aplicável)
+* **Context**: the architectural problem or need
+* **Decision**: the choice made
+* **Consequences**: positive and negative impacts
+* **Alternatives considered** (when applicable)
 
-As decisões aqui descritas **refletem o estado real do código no momento do commit**.
+The decisions described here **reflect the actual state of the code at the time of the commit**.
 
-## Convenções
+## Conventions
 
-* Cada ADR possui um identificador sequencial (`0001`, `0002`, …).
-* ADRs são **imutáveis após aceitos**, isto é, após a decisão estar aplicada no código.
+* Each ADR has a sequential identifier (`0001`, `0002`, …).
+* ADRs are **immutable once accepted**, i.e., after the decision has been applied to the code.
+* If a decision changes, a new ADR must be created, referencing the previous one.
+* ADRs should only be added when the decision is **already applied or immediately applicable** to the code.
 
+## Existing ADRs
 
-  * Caso uma decisão mude, um novo ADR deve ser criado, referenciando o anterior.
-* ADRs só devem ser adicionados quando a decisão **já estiver aplicada ou imediatamente aplicável** ao código.
-
-## ADRs existentes
-
-|   ID | Título                               |
+|   ID | Title                                |
 | ---: | ------------------------------------ |
 | 0001 | Layered Architecture                 |
 | 0002 | Architecture Enforcement via Tooling |
@@ -39,4 +37,4 @@ As decisões aqui descritas **refletem o estado real do código no momento do co
 
 ---
 
-Para regras de negócio e fluxos da aplicação (nível funcional), consulte `docs/use-cases.md`.
+For business rules and application flows (functional level), see `docs/use-cases.md`.

@@ -1,35 +1,35 @@
-# ADR 0001: Arquitetura em Camadas com Inversão de Dependências
+# ADR 0001: Layered Architecture with Dependency Inversion
 
-## Contexto
+## Context
 
-O projeto possui um domínio com regras de negócio não triviais e exige separação clara entre lógica de negócio, orquestração de casos de uso, detalhes de infraestrutura e interface HTTP.
+The project has a domain with non-trivial business rules and requires a clear separation between business logic, use case orchestration, infrastructure details, and the HTTP interface.
 
-O domínio é tratado como o núcleo do sistema, seguindo princípios de Domain-Driven Design (DDD).
+The domain is treated as the core of the system, following Domain-Driven Design (DDD) principles.
 
-Frameworks como NestJS oferecem alta flexibilidade estrutural, o que pode levar a acoplamento excessivo entre camadas se não houver uma decisão arquitetural explícita sobre direção de dependências e controle de abstrações.
+Frameworks like NestJS offer high structural flexibility, which can lead to excessive coupling between layers if there is no explicit architectural decision regarding dependency direction and abstraction control.
 
-## Decisão
+## Decision
 
-Adotar uma **arquitetura em camadas** baseada no **Dependency Inversion Principle (DIP)**, com responsabilidades bem definidas e dependências unidirecionais:
+Adopt a **layered architecture** based on the **Dependency Inversion Principle (DIP)**, with well-defined responsibilities and unidirectional dependencies:
 
-- **Domain**: núcleo do negócio, contendo entidades, regras e abstrações
-- **Application**: orquestração de casos de uso e coordenação do domínio
-- **Infrastructure**: detalhes técnicos, ORM, banco de dados e integrações externas
-- **HTTP**: interface de entrada (controllers, DTOs, módulos)
+- **Domain**: the business core, containing entities, rules, and abstractions
+- **Application**: use case orchestration and domain coordination
+- **Infrastructure**: technical details, ORM, database, and external integrations
+- **HTTP**: entry interface (controllers, DTOs, modules)
 
-### Regras fundamentais
+### Fundamental Rules
 
-- Camadas internas **não dependem** de camadas externas
-- O domínio **não conhece** frameworks, ORM, banco de dados ou mecanismos de entrega
-- Camadas internas dependem apenas de **abstrações**
-- Camadas externas fornecem **implementações concretas**
-- A ligação entre abstrações e implementações é feita por **Dependency Injection**, preferencialmente via container do framework
-- Dependências fluem sempre **de fora para dentro**
+- Inner layers **do not depend** on outer layers
+- The domain **does not know** about frameworks, ORM, database, or delivery mechanisms
+- Inner layers depend only on **abstractions**
+- Outer layers provide **concrete implementations**
+- The link between abstractions and implementations is made via **Dependency Injection**, preferably through the framework's container
+- Dependencies always flow **from the outside in**
 
-## Consequências
+## Consequences
 
-- Domínio isolado de detalhes técnicos
-- Redução de acoplamento estrutural e acidental
-- Facilidade de testes unitários e substituição de infraestrutura
-- Maior previsibilidade arquitetural
-- Necessidade de maior disciplina no uso de abstrações e no registro explícito de dependências
+- Domain isolated from technical details
+- Reduction of structural and accidental coupling
+- Ease of unit testing and infrastructure replacement
+- Greater architectural predictability
+- Requirement for more discipline in the use of abstractions and explicit dependency registration

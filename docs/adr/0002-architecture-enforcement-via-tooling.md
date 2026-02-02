@@ -1,23 +1,23 @@
-# ADR 0002: Governança Arquitetural via TypeScript e ESLint
+# ADR 0002: Architectural Governance via TypeScript and ESLint
 
-## Contexto
+## Context
 
-A arquitetura em camadas, por si só, não é suficiente para evitar violações estruturais ao longo do tempo, especialmente em um framework flexível como o NestJS.
+Layered architecture, by itself, is not enough to prevent structural violations over time, especially in a flexible framework like NestJS.
 
-Confiar apenas em disciplina humana para manter limites arquiteturais é frágil e não escala.
+Relying solely on human discipline to maintain architectural boundaries is fragile and does not scale.
 
-## Decisão
+## Decision
 
-Utilizar **TypeScript e ESLint como ferramentas de enforcement arquitetural**, aplicando restrições explícitas em tempo de desenvolvimento.
+Use **TypeScript and ESLint as architectural enforcement tools**, applying explicit restrictions during development time.
 
-A estratégia inclui:
+The strategy includes:
 
-* Alias de paths refletindo as camadas arquiteturais
-* Regras de importação que impedem dependências inválidas entre camadas
-* Violação arquitetural tratada como erro de lint, não como convenção informal
+* Path aliases reflecting the architectural layers
+* Import rules that prevent invalid dependencies between layers
+* Architectural violations treated as lint errors, not as informal conventions
 
-## Consequências
+## Consequences
 
-* Violações arquiteturais são detectadas imediatamente
-* Menor liberdade estrutural em troca de maior consistência
-* Arquitetura tratada como regra técnica, não como guideline opcional
+* Architectural violations are detected immediately
+* Less structural freedom in exchange for greater consistency
+* Architecture treated as a technical rule, not as an optional guideline

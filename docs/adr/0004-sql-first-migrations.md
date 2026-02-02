@@ -1,23 +1,23 @@
-# ADR 0004: Estratégia SQL-first para Migrations
+# ADR 0004: SQL-First Migrations Strategy
 
-## Contexto
+## Context
 
-A adoção de recursos avançados do PostgreSQL torna inviável a geração automática de migrations a partir de schemas TypeScript ou DSLs de ORM.
+The adoption of advanced PostgreSQL features makes it unfeasible to automatically generate migrations from TypeScript schemas or ORM DSLs.
 
-Migrations automáticas tendem a gerar drift e perda de controle em cenários com SQL avançado.
+Automatic migrations tend to cause drift and loss of control in scenarios involving advanced SQL.
 
-## Decisão
+## Decision
 
-Adotar uma estratégia **SQL-first para migrations**, com as seguintes regras:
+Adopt a **SQL-first strategy for migrations**, with the following rules:
 
-* Migrations são escritas explicitamente em SQL
-* SQL avançado é encorajado e versionado
-* Nenhuma migration é gerada automaticamente a partir de código
+* Migrations are explicitly written in SQL
+* Advanced SQL is encouraged and versioned
+* No migration is automatically generated from code
 
-O ORM é utilizado apenas como executor e integrador do fluxo de migrations.
+The ORM is used only as an executor and integrator of the migration flow.
 
-## Consequências
+## Consequences
 
-* Total previsibilidade sobre alterações de schema
-* Maior responsabilidade na escrita de migrations
-* Eliminação de abstrações frágeis sobre o banco
+* Total predictability over schema changes
+* Greater responsibility in writing migrations
+* Elimination of fragile abstractions over the database
