@@ -1,132 +1,132 @@
-# Use Cases — Sistema de Reservas
+# Use Cases — Reservation System
 
-Este documento define os **casos de uso essenciais** do sistema.
-Ele descreve as regras de negócio esperadas que impactam schema, queries e validações.
+This document defines the **essential use cases** of the system.
+It describes the expected business rules that impact schema, queries, and validations.
 
-> **Nota sobre atores:**
-> Todos os atores deste documento representam papéis exercidos por Usuários do sistema.
-> Cliente é o usuário que realiza reservas.
-> Barbeiro é um usuário especializado com agenda própria.
-> Processo Administrativo representa ações internas ou administrativas do sistema.
-
----
-
-## UC-00 — Criar Usuário
-
-**Ator:** Usuário (Cadastro)
-
-### Fluxo principal
-
-1. Sistema recebe email e password
-2. Sistema valida formato do email
-3. Sistema gera e valida o password hash
-4. Usuário é criado com sucesso
-
-### Regras de negócio
-
-* Email deve ter formato válido
-* Email deve ser único
-* Password **não é armazenado em texto puro**
-* Usuário é criado como entidade base do sistema
+> **Note on actors:**
+> All actors in this document represent roles played by system Users.
+> Client is the user who makes reservations.
+> Barber is a specialized user with their own schedule.
+> Administrative Process represents internal or administrative system actions.
 
 ---
 
-## UC-01 — Criar Barbeiro
+## UC-00 — Create User
 
-**Ator:** Processo Administrativo
+**Actor:** User (Registration)
 
-### Fluxo principal
+### Primary Flow
 
-1. Sistema recebe um `userId`
-2. Sistema verifica se o usuário existe
-3. Sistema verifica se o usuário já é barbeiro
-4. Sistema cria o barbeiro associado ao usuário
+1. System receives email and password
+2. System validates email format
+3. System generates and validates the password hash
+4. User is successfully created
 
-### Regras de negócio
+### Business Rules
 
-* Barbeiro é uma **especialização de usuário**
-* Um usuário pode ser barbeiro **no máximo uma vez**
-* A identidade do barbeiro é derivada da identidade do usuário
-* Barbeiro é criado como ativo por padrão
-
----
-
-## UC-02 — Criar Reserva
-
-**Ator:** Cliente
-
-### Fluxo principal
-
-1. Cliente seleciona um barbeiro
-2. Informa `start_time` e `end_time`
-3. Sistema valida:
-   * horário válido
-   * barbeiro ativo
-4. Sistema tenta criar a reserva
-5. Reserva é criada com sucesso
-
-### Regras de negócio
-
-* `start_time` deve ser anterior a `end_time`
-* O intervalo deve representar um horário válido de reserva
-* O barbeiro deve estar ativo
-* O sistema **não consulta previamente** disponibilidade
-* Conflitos de horário são tratados via **constraint no banco**
-* Violação de constraint resulta em **erro de conflito de reserva**
+* Email must have a valid format
+* Email must be unique
+* Password **is not stored in plain text**
+* User is created as the system's base entity
 
 ---
 
-## UC-03 — Cancelar Reserva
+## UC-01 — Create Barber
 
-**Ator:** Cliente ou barbeiro
+**Actor:** Administrative Process
 
-### Fluxo principal
+### Primary Flow
 
-1. Sistema verifica se a reserva existe
-2. Sistema verifica autorização:
-   * pertence ao cliente **ou**
-   * ao barbeiro
-3. Reserva é marcada como cancelada (soft state)
+1. System receives a `userId`
+2. System verifies if the user exists
+3. System verifies if the user is already a barber
+4. System creates the barber associated with the user
 
-### Observações
+### Business Rules
 
-* Reserva **não é deletada**
-* Persistência de cancelamento (ex: `status`, `canceled_at`) ainda não implementada
-
----
-
-## UC-04 — Listar Agenda do Barbeiro
-
-**Ator:** Barbeiro
-
-### Fluxo principal
-
-1. Sistema recebe um intervalo de datas (`start_time` / `end_time`)
-2. Retorna reservas do barbeiro no período
-3. Resultado ordenado por `start_time`
-
-### Decisões pendentes
-
-* Inclusão de reservas canceladas
-* Política de visibilidade por período
+* Barber is a **user specialization**
+* A user can be a barber **at most once**
+* The barber's identity is derived from the user's identity
+* Barber is created as active by default
 
 ---
 
-## UC-05 — Listar Reservas do Cliente
+## UC-02 — Create Reservation
 
-**Ator:** Cliente
+**Actor:** Client
 
-### Fluxo principal
+### Primary Flow
 
-1. Retorna reservas do cliente
-2. Resultado paginado
-3. Ordenado por `start_time`
+1. Client selects a barber
+2. Provides `start_time` and `end_time`
+3. System validates:
+   * valid time interval
+   * active barber
+4. System attempts to create the reservation
+5. Reservation is successfully created
 
-### Decisões pendentes
+### Business Rules
 
-* Inclusão de reservas canceladas
-* Política de visibilidade de reservas passadas
+* `start_time` must be before `end_time`
+* The interval must represent a valid reservation time
+* The barber must be active
+* The system **does not pre-check availability beforeband**
+* Schedule conflicts are handled via **database constraint**
+* Constraint violation results in a **reservation conflict error**
 
-### Observações
+---
 
-* Datas e horários são tratados em UTC
+## UC-03 — Cancel Reservation
+
+**Actor:** Client or Barber
+
+### Primary Flow
+
+1. System verifies if the reservation exists
+2. System verifies authorization:
+   * belongs to the client **or**
+   * to the barber
+3. Reservation is marked as cancelled (soft state)
+
+### Observations
+
+* Reservation **is not deleted**
+* Cancellation persistence (e.g., `status`, `canceled_at`) not yet implemented
+
+---
+
+## UC-04 — List Barber Schedule
+
+**Actor:** Barber
+
+### Primary Flow
+
+1. System receives a date range (`start_time` / `end_time`)
+2. Returns the barber's reservations in the period
+3. Result sorted by `start_time`
+
+### Pending Decisions
+
+* Inclusion of cancelled reservations
+* Visibility policy per period
+
+---
+
+## UC-05 — List Client Reservations
+
+**Actor:** Client
+
+### Primary Flow
+
+1. Returns the client's reservations
+2. Paginated result
+3. Sorted by `start_time`
+
+### Pending Decisions
+
+* Inclusion of cancelled reservations
+* Visibility policy for past reservations
+
+### Observations
+
+* Dates and times are handled in UTC
