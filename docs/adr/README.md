@@ -31,6 +31,11 @@ As decisões aqui descritas **refletem o estado real do código no momento do co
 | ---: | ------------------------------------ |
 | 0001 | Layered Architecture                 |
 | 0002 | Architecture Enforcement via Tooling |
+| 0003 | PostgreSQL-First Database Strategy   |
+| 0004 | SQL-First Migrations                 |
+| 0005 | Drizzle over Prisma                  |
+| 0006 | SQL-First Migration Runner           |
+| 0007 | Barber as Specialized User           |
 
 ---
 
