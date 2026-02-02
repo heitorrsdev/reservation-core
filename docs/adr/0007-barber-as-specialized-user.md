@@ -1,94 +1,94 @@
-   # ADR 0007 – User como Identidade, Barber como Especialização (Shared Primary Key)
+# ADR 0007 – User as Identity, Barber as Specialization (Shared Primary Key)
 
-   ## Contexto
+## Context
 
-   O sistema precisa lidar com reservas entre clientes e barbeiros. O modelo inicial tentou representar isso usando:
+The system needs to handle reservations between clients and barbers. The initial model attempted to represent this using:
 
-   * `users` com um campo `role` (CLIENT | BARBER | ADMIN)
-   * Uma tabela separada `barbers`
+* `users` with a `role` field (CLIENT | BARBER | ADMIN)
+* A separate `barbers` table
 
-   Isso criou ambiguidade conceitual:
+This created conceptual ambiguity:
 
-   * Um barbeiro era ao mesmo tempo um *role* e uma *entidade*
-   * A fonte de verdade sobre “quem é barbeiro” ficou duplicada
-   * A tabela `reservations` passou a depender de entidades mal definidas
+* A barber was simultaneously a *role* and an *entity*
+* The source of truth regarding "who is a barber" was duplicated
+* The `reservations` table became dependent on poorly defined entities
 
-   Além disso, o papel `ADMIN` não possui casos de uso reais no momento, caracterizando YAGNI.
+Additionally, the `ADMIN` role has no real use cases at the moment, characterizing YAGNI (You Ain't Gonna Need It).
 
-   ## Decisão
+## Decision
 
-   1. **User será tratado exclusivamente como identidade/autenticação**
+1. **User will be treated exclusively as identity/authentication**
 
-      * Representa qualquer pessoa que pode se autenticar no sistema
-      * Não carrega semântica de negócio além disso
+   * Represents any person who can authenticate in the system
+   * Carries no business semantics beyond that
 
-   2. **Barber será uma especialização de User**
+2. **Barber will be a specialization of User**
 
-      * Um barbeiro é um User com dados e comportamentos adicionais
-      * A existência de um registro em `barbers` define se o User é barbeiro
+   * A barber is a User with additional data and behaviors
+   * The existence of a record in `barbers` defines whether the User is a barber
 
-   3. **Relacionamento User ↔ Barber será 1:1 com chave primária compartilhada**
+3. **User ↔ Barber relationship will be 1:1 with a shared primary key**
 
-      * `barbers.id` será ao mesmo tempo PK e FK para `users.id`
-      * Garante consistência forte: não existe Barber sem User
+   * `barbers.id` will be both the PK and a FK to `users.id`
+   * Ensures strong consistency: no Barber exists without a User
 
-   4. **Não haverá distinção explícita de “Cliente”**
+4. **There will be no explicit distinction for "Client"**
 
-      * Cliente é qualquer User que **não** seja Barber
-      * Um Barber pode atuar como cliente (ex: agendar horário com outro barbeiro)
+   * A Client is any User who is **not** a Barber
+   * A Barber can act as a client (e.g., booking a time with another barber)
 
-   5. **O conceito de Admin será removido**
+5. **The Admin concept will be removed**
 
-      * Não há necessidade atual
-      * Evita complexidade e regras especiais prematuras
+   * There is no current need
+   * Avoids premature complexity and special rules
 
-   ## Consequências
+## Consequences
 
-   ### Positivas
+### Positive
 
-   * Eliminação de duplicação conceitual (role vs entidade)
-   * Modelo alinhado com práticas comuns em sistemas de marketplace
-   * Regras de negócio mais claras e fáceis de evoluir
-   * Banco de dados passa a refletir corretamente o domínio
+* Elimination of conceptual duplication (role vs. entity)
+* Model aligned with common practices in marketplace systems
+* Clearer business rules that are easier to evolve
+* Database correctly reflects the domain
 
-   ### Negativas / Trade-offs
+### Negative / Trade-offs
 
-   * A distinção entre cliente e barbeiro não é explícita via enum ou flag
-   * Consultas precisam usar `JOIN` ou `EXISTS` para verificar se um User é Barber
-   * Autorização baseada em papel exigirá uma camada própria no futuro
+* The distinction between client and barber is not explicit via enum or flag
+* Queries need to use `JOIN` or `EXISTS` to verify if a User is a Barber
+* Role-based authorization will require its own layer in the future
 
-   Esses trade-offs são considerados aceitáveis e preferíveis à rigidez e ambiguidade do modelo anterior.
+These trade-offs are considered acceptable and preferable to the rigidity and ambiguity of the previous model.
 
-   ## Estrutura Conceitual Resultante
+## Resulting Conceptual Structure
 
-   ### users
+### users
 
-   * id (PK)
-   * email
-   * password_hash
-   * created_at
+* id (PK)
+* email
+* password_hash
+* created_at
 
-   ### barbers
+### barbers
 
-   * id (PK, FK → users.id)
-   * name
-   * bio
-   * active
-   * created_at
+* id (PK, FK → users.id)
+* name
+* bio
+* active
+* created_at
 
-   ### reservations
+### reservations
 
-   * id (PK)
-   * user_id (FK → users.id)      -- cliente
-   * barber_id (FK → barbers.id)
-   * start_time
-   * end_time
-   * period
-   * created_at
+* id (PK)
+* user_id (FK → users.id)      -- client
+* barber_id (FK → barbers.id)
+* start_time
+* end_time
+* period
+* created_at
 
-   As constraints de tempo e sobreposição permanecem inalteradas.
+Time and overlap constraints remain unchanged.
 
-   ## Observações Finais
+## Final Observations
 
-   Esta decisão foca exclusivamente em **modelagem correta do domínio e do banco**.
-   Questões de autorização (ex: quem pode criar agenda, atender clientes, etc.) serão tratadas posteriormente em nível de aplicação.
+This decision focuses exclusively on **correct domain and database modeling**.
+Authorization issues (e.g., who can create a schedule, serve clients, etc.) will be handled later at the application level.

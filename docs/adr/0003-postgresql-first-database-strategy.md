@@ -1,23 +1,23 @@
-# ADR 0003: Estratégia PostgreSQL-first para o Modelo de Dados
+# ADR 0003: PostgreSQL-First Database Strategy for the Data Model
 
-## Contexto
+## Context
 
-O domínio da aplicação envolve regras relacionadas a tempo, concorrência e integridade que são naturalmente expressas no nível do banco de dados.
+The application domain involves rules related to time, concurrency, and integrity that are naturally expressed at the database level.
 
-Implementar essas regras apenas na camada de aplicação aumenta risco de inconsistência e condições de corrida.
+Implementing these rules only in the application layer increases the risk of inconsistency and race conditions.
 
-## Decisão
+## Decision
 
-Adotar uma abordagem **PostgreSQL-first**, onde o banco de dados é a **fonte da verdade** para regras estruturais e de integridade.
+Adopt a **PostgreSQL-first** approach, where the database is the **source of truth** for structural and integrity rules.
 
-Diretrizes:
+Guidelines:
 
-* Regras críticas vivem no banco sempre que possível
-* Recursos avançados do PostgreSQL são considerados parte do domínio
-* O ORM não é responsável por abstrair semântica complexa do banco
+* Critical rules live in the database whenever possible
+* Advanced PostgreSQL features are considered part of the domain
+* The ORM is not responsible for abstracting complex database semantics
 
-## Consequências
+## Consequences
 
-* Garantias fortes de integridade e concorrência
-* Redução de lógica defensiva na aplicação
-* Maior dependência consciente de PostgreSQL
+* Strong guarantees of integrity and concurrency
+* Reduction of defensive logic in the application
+* Greater conscious dependency on PostgreSQL

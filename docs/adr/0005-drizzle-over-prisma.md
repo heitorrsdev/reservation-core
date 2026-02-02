@@ -1,24 +1,24 @@
-# ADR 0005: Adoção do Drizzle ORM em vez do Prisma
+# ADR 0005: Adoption of Drizzle ORM over Prisma
 
-## Contexto
+## Context
 
-O projeto foi iniciado utilizando o Prisma ORM, visando produtividade e tipagem forte.
+The project was started using Prisma ORM, aiming for productivity and strong typing.
 
-Com a evolução do domínio, surgiram requisitos que exigem uso extensivo de recursos avançados do PostgreSQL, gerando fricção com o modelo de abstração do Prisma.
+As the domain evolved, requirements emerged that demand extensive use of advanced PostgreSQL features, creating friction with Prisma's abstraction model.
 
-## Decisão
+## Decision
 
-Substituir o Prisma ORM pelo **Drizzle ORM**, adotando uma abordagem ORM-thin e SQL-first.
+Replace Prisma ORM with **Drizzle ORM**, adopting an ORM-thin and SQL-first approach.
 
-Critérios determinantes:
+Determining criteria:
 
-* Menor abstração sobre o PostgreSQL
-* Melhor convivência com SQL explícito
-* Redução de workarounds e risco de drift
-* Alinhamento com a estratégia PostgreSQL-first
+* Less abstraction over PostgreSQL
+* Better coexistence with explicit SQL
+* Reduction of workarounds and risk of drift
+* Alignment with the PostgreSQL-first strategy
 
-## Consequências
+## Consequences
 
-* Maior proximidade entre código e banco
-* Menor “magia” do ORM
-* Mais responsabilidade explícita na camada de infraestrutura
+* Closer proximity between code and database
+* Less ORM "magic"
+* More explicit responsibility in the infrastructure layer
