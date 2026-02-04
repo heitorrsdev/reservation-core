@@ -1,6 +1,6 @@
 import { Barber } from '@domain/barber/barber.entity';
 import { BarberRepository } from '@domain/barber/barber.repository';
-import { UserAlreadyBarber } from '@domain/barber/errors/user-already-barber.error';
+import { UserAlreadyBarberError } from '@domain/barber/errors/user-already-barber.error';
 import { UserNotFoundError } from '@domain/user/errors/user-not-found.error';
 import { UserRepository } from '@domain/user/user.repository';
 
@@ -20,7 +20,7 @@ export class CreateBarberUseCase {
 
     const barberExists = await this.barberRepository.findById(command.userId);
     if (barberExists) {
-      throw new UserAlreadyBarber(command.userId);
+      throw new UserAlreadyBarberError(command.userId);
     }
 
     const barber = Barber.create({
