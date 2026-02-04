@@ -79,7 +79,7 @@ dev-reset:
 
 dev-migrate:
 	npx dotenv-cli -e $(DEV_ENV) -- \
-		npx ts-node src/infrastructure/database/migrate.ts
+		npx ts-node src/infrastructure/scripts/migrate.ts
 
 
 # ─────────────────────────────────────────────────────────────
@@ -92,7 +92,7 @@ prod-up: check-prod-env
 
 prod-migrate: check-prod-env
 	npx dotenv-cli -e $(PROD_ENV) -- \
-		npx ts-node src/infrastructure/database/migrate.ts
+		npx ts-node src/infrastructure/scripts/migrate.ts
 
 
 # ─────────────────────────────────────────────────────────────
