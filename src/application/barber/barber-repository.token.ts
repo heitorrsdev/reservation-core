@@ -1,0 +1,1 @@
+export const BARBER_REPOSITORY = Symbol('BARBER_REPOSITORY');
