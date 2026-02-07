@@ -13,3 +13,5 @@ export function createDatabase() {
   const pool = new Pool({ connectionString: url });
   return drizzle(pool);
 }
+
+export type Database = ReturnType<typeof createDatabase>;
