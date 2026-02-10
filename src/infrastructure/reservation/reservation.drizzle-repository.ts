@@ -8,17 +8,15 @@ import { DATABASE } from '@infrastructure/database/database.token';
 import { DrizzleDatabase } from '@infrastructure/database/schema/drizzle';
 import { reservations } from '@infrastructure/database/schema/reservation';
 
+import { ReservationMapper } from './reservation.mapper';
+
 export class ReservationDrizzleRepository implements ReservationRepository {
   constructor(@Inject(DATABASE) private readonly db: DrizzleDatabase) {}
   async save(reservationEntity: Reservation): Promise<void> {
     try {
-      await this.db.insert(reservations).values({
-        id: reservationEntity.id,
-        userId: reservationEntity.userId,
-        barberId: reservationEntity.barberId,
-        startTime: reservationEntity.startTime,
-        endTime: reservationEntity.endTime,
-      });
+      const data = ReservationMapper.toPersistence(reservation);
+
+      await this.db.insert(reservations).values(data);
     } catch (error: unknown) {
       if (
         error &&
