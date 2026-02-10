@@ -13,22 +13,24 @@ export class Reservation {
   ) {}
 
   static create(props: {
+    id?: string;
     userId: string;
     barberId: string;
     startTime: Date;
     endTime: Date;
+    createdAt?: Date;
   }) {
     if (props.endTime <= props.startTime) {
       throw new InvalidReservationTimeError();
     }
 
     return new Reservation(
-      randomUUID(),
+      props.id || randomUUID(),
       props.userId,
       props.barberId,
       props.startTime,
       props.endTime,
-      new Date(),
+      props.createdAt || new Date(),
     );
   }
 }
