@@ -12,7 +12,8 @@ import { ReservationMapper } from './reservation.mapper';
 
 export class ReservationDrizzleRepository implements ReservationRepository {
   constructor(@Inject(DATABASE) private readonly db: DrizzleDatabase) {}
-  async save(reservationEntity: Reservation): Promise<void> {
+
+  async save(reservation: Reservation): Promise<void> {
     try {
       const data = ReservationMapper.toPersistence(reservation);
 
