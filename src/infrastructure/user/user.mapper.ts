@@ -14,4 +14,18 @@ export class UserMapper {
       createdAt: raw.createdAt,
     });
   }
+
+  static toPersistence(user: User): {
+    id: string;
+    email: string;
+    passwordHash: string;
+    createdAt: Date;
+  } {
+    return {
+      id: user.id,
+      email: user.email.value,
+      passwordHash: user.passwordHash.value,
+      createdAt: user.createdAt,
+    };
+  }
 }
