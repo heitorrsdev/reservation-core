@@ -19,16 +19,23 @@ export class ReservationDrizzleRepository implements ReservationRepository {
 
       await this.db.insert(reservations).values(data);
     } catch (error: unknown) {
-      if (
-        error &&
-        typeof error === 'object' &&
-        'code' in error &&
-        error.code === '23P01' // exclusion_violation
-      ) {
+      if (this.errorHasCode(error, '23P01')) {
         throw new ReservationConflictError();
       }
 
       throw error;
     }
+  }
+
+  private errorHasCode(error: unknown, code: string): boolean {
+    if (
+      error &&
+      typeof error === 'object' &&
+      'code' in error &&
+      error.code === code
+    ) {
+      return true;
+    }
+    return false;
   }
 }
