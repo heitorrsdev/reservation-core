@@ -1,17 +1,17 @@
 import { User } from '@domain/user/user.entity';
 
 export class UserMapper {
-  static toDomain(raw: {
+  static toDomain(row: {
     id: string;
     email: string;
     passwordHash: string;
     createdAt: Date;
   }): User {
     return User.create({
-      id: raw.id,
-      email: raw.email,
-      passwordHash: raw.passwordHash,
-      createdAt: raw.createdAt,
+      id: row.id,
+      email: row.email,
+      passwordHash: row.passwordHash,
+      createdAt: row.createdAt,
     });
   }
 
