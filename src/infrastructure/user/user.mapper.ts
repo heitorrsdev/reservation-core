@@ -1,12 +1,13 @@
 import { User } from '@domain/user/user.entity';
 
+type userRow = {
+  id: string;
+  email: string;
+  passwordHash: string;
+  createdAt: Date;
+};
 export class UserMapper {
-  static toDomain(row: {
-    id: string;
-    email: string;
-    passwordHash: string;
-    createdAt: Date;
-  }): User {
+  static toDomain(row: userRow): User {
     return User.create({
       id: row.id,
       email: row.email,
@@ -15,12 +16,7 @@ export class UserMapper {
     });
   }
 
-  static toPersistence(user: User): {
-    id: string;
-    email: string;
-    passwordHash: string;
-    createdAt: Date;
-  } {
+  static toPersistence(user: User): userRow {
     return {
       id: user.id,
       email: user.email.value,
