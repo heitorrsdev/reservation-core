@@ -6,8 +6,7 @@ import { ReservationRepository } from '@domain/reservation/reservation.repositor
 
 import { DATABASE } from '@infrastructure/database/database.token';
 import { DrizzleDatabase } from '@infrastructure/database/schema/drizzle';
-
-import { reservations } from '../database/schema/reservation';
+import { reservations } from '@infrastructure/database/schema/reservation';
 
 export class ReservationDrizzleRepository implements ReservationRepository {
   constructor(@Inject(DATABASE) private readonly db: DrizzleDatabase) {}
