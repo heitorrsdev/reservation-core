@@ -18,9 +18,10 @@ TREE_IGNORE = node_modules|.git|dist|*.env*
 # ─────────────────────────────────────────────────────────────
 
 .PHONY: \
-	dev-up dev-down dev-migrate \
- prod-migrate \
+	dev-up dev-down dev-reset dev-migrate \
+	prod-up prod-migrate \
 	test-up test-down test-reset test-migrate test-run \
+	lint typecheck build \
 	check-dev-env check-prod-env check-test-env \
 	tree
 
