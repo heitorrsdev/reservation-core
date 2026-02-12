@@ -4,25 +4,25 @@
 
 DEV_ENV  = .env.dev
 PROD_ENV = .env.prod
+TEST_ENV = .env.test
 
 DEV_COMPOSE  = docker/docker-compose.dev.yml
 PROD_COMPOSE = docker/docker-compose.prod.yml
+TEST_COMPOSE = docker/docker-compose.test.yml
 
 MIGRATIONS_DIR = migrations
 TREE_IGNORE = node_modules|.git|dist|*.env*
-
 
 # ─────────────────────────────────────────────────────────────
 # Phony
 # ─────────────────────────────────────────────────────────────
 
 .PHONY: \
-	dev-up dev-down \
-	dev-migrate-apply prod-migrate \
-	check-dev-env check-prod-env \
-	lint typecheck test \
+	dev-up dev-down dev-migrate \
+ prod-migrate \
+	test-up test-down test-reset test-migrate test-run \
+	check-dev-env check-prod-env check-test-env \
 	tree
-
 
 # ─────────────────────────────────────────────────────────────
 # Checks
@@ -38,9 +38,13 @@ check-prod-env:
 	@grep -q "^DATABASE_URL=" $(PROD_ENV) || \
 		(echo "❌ DATABASE_URL ausente (.env.prod)" && exit 1)
 
+check-test-env:
+	@test -f $(TEST_ENV) || (echo "❌ .env.test não existe" && exit 1)
+	@grep -q "^DATABASE_URL=" $(TEST_ENV) || \
+		(echo "❌ DATABASE_URL ausente (.env.test)" && exit 1)
 
 # ─────────────────────────────────────────────────────────────
-# Qualidade (CI-safe)
+# CI
 # ─────────────────────────────────────────────────────────────
 
 lint:
@@ -49,10 +53,10 @@ lint:
 typecheck:
 	pnpm tsc --noEmit
 
-test:
-	pnpm test
-
-
+ci-test:
+	make test-up
+	make test
+	make test-down
 # ─────────────────────────────────────────────────────────────
 # DEV
 # ─────────────────────────────────────────────────────────────
@@ -81,7 +85,6 @@ dev-migrate:
 	npx dotenv-cli -e $(DEV_ENV) -- \
 		npx ts-node src/infrastructure/scripts/migrate.ts
 
-
 # ─────────────────────────────────────────────────────────────
 # PROD
 # ─────────────────────────────────────────────────────────────
@@ -94,6 +97,29 @@ prod-migrate: check-prod-env
 	npx dotenv-cli -e $(PROD_ENV) -- \
 		npx ts-node src/infrastructure/scripts/migrate.ts
 
+# ────────────────────────────────────────────────────────────
+# TEST
+# ────────────────────────────────────────────────────────────
+
+test-up: check-test-env
+	@echo "🧪 Subindo Postgres TEST"
+	docker compose -f $(TEST_COMPOSE) up -d
+
+test-down:
+	@echo "⬇️ Removendo containers TEST (mantendo volumes)"
+	docker compose -f $(TEST_COMPOSE) down
+
+test-reset:
+	@echo "💥 Resetando ambiente TEST (containers + volumes)"
+	docker compose -f $(TEST_COMPOSE) down -v
+
+test-migrate: check-test-env
+	npx dotenv-cli -e $(TEST_ENV) -- \
+		npx ts-node src/infrastructure/scripts/migrate.ts
+
+test:
+	npx dotenv-cli -e $(TEST_ENV) -- \
+		pnpm jest
 
 # ─────────────────────────────────────────────────────────────
 # Utils
