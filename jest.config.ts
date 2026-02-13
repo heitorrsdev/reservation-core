@@ -1,4 +1,3 @@
-// jest.config.ts
 import type { Config } from 'jest';
 
 const config: Config = {
@@ -9,6 +8,8 @@ const config: Config = {
     '^@domain/(.*)$': '<rootDir>/src/domain/$1',
     '^@application/(.*)$': '<rootDir>/src/application/$1',
     '^@infrastructure/(.*)$': '<rootDir>/src/infrastructure/$1',
+    '^@http/(.*)$': '<rootDir>/src/http/$1',
+    '^@test/(.*)$': '<rootDir>/test/$1',
   },
 };
 

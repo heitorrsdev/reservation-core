@@ -1,4 +1,4 @@
-import { InfrastructureError } from '@infrastructure/errors/infrastructure';
+import { InfrastructureError } from '../../errors/infrastructure';
 
 export class DatabaseUrlNotDefinedError extends InfrastructureError {
   constructor() {

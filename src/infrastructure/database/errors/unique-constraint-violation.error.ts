@@ -1,4 +1,4 @@
-import { InfrastructureError } from '@infrastructure/errors/infrastructure';
+import { InfrastructureError } from '../../errors/infrastructure';
 
 export class UniqueConstraintViolationError extends InfrastructureError {
   constructor(readonly constraint: string) {
