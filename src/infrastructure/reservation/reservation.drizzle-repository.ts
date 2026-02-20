@@ -4,14 +4,14 @@ import { ReservationConflictError } from '@domain/reservation/errors/reservation
 import { Reservation } from '@domain/reservation/reservation.entity';
 import { ReservationRepository } from '@domain/reservation/reservation.repository';
 
+import { Database } from '@infrastructure/database/database.provider';
 import { DATABASE } from '@infrastructure/database/database.token';
-import { DrizzleDatabase } from '@infrastructure/database/schema/drizzle';
 import { reservations } from '@infrastructure/database/schema/reservation';
 
 import { ReservationMapper } from './reservation.mapper';
 
 export class ReservationDrizzleRepository implements ReservationRepository {
-  constructor(@Inject(DATABASE) private readonly db: DrizzleDatabase) {}
+  constructor(@Inject(DATABASE) private readonly db: Database) {}
 
   async save(reservation: Reservation): Promise<void> {
     try {

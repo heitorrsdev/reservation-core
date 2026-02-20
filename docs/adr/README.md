@@ -34,6 +34,8 @@ The decisions described here **reflect the actual state of the code at the time 
 | 0005 | Drizzle over Prisma                  |
 | 0006 | SQL-First Migration Runner           |
 | 0007 | Barber as Specialized User           |
+| 0008 | Drizzle schema in database provider  |
+
 
 ---
 
