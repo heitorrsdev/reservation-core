@@ -1,4 +1,5 @@
 import { Inject } from '@nestjs/common';
+import { eq } from 'drizzle-orm';
 
 import { ReservationConflictError } from '@domain/reservation/errors/reservation-conflict.error';
 import { Reservation } from '@domain/reservation/reservation.entity';
@@ -6,9 +7,10 @@ import { ReservationRepository } from '@domain/reservation/reservation.repositor
 
 import { Database } from '@infrastructure/database/database.provider';
 import { DATABASE } from '@infrastructure/database/database.token';
+import { PostgresErrorMapper } from '@infrastructure/database/postgres-error.mapper';
 import { reservations } from '@infrastructure/database/schema/reservation';
 
-import { ReservationMapper } from './reservation.mapper';
+import { ReservationMapper, ReservationRow } from './reservation.mapper';
 
 export class ReservationDrizzleRepository implements ReservationRepository {
   constructor(@Inject(DATABASE) private readonly db: Database) {}
@@ -16,10 +18,9 @@ export class ReservationDrizzleRepository implements ReservationRepository {
   async save(reservation: Reservation): Promise<void> {
     try {
       const data = ReservationMapper.toPersistence(reservation);
-
       await this.db.insert(reservations).values(data);
     } catch (error: unknown) {
-      if (this.errorHasCode(error, '23P01')) {
+      if (PostgresErrorMapper.isUniqueViolation(error)) {
         throw new ReservationConflictError();
       }
 
@@ -27,15 +28,12 @@ export class ReservationDrizzleRepository implements ReservationRepository {
     }
   }
 
-  private errorHasCode(error: unknown, code: string): boolean {
-    if (
-      error &&
-      typeof error === 'object' &&
-      'code' in error &&
-      error.code === code
-    ) {
-      return true;
-    }
-    return false;
+  async findById(id: string): Promise<Reservation | null> {
+    const [row]: ReservationRow[] = await this.db
+      .select()
+      .from(reservations)
+      .where(eq(reservations.id, id));
+
+    return row ? ReservationMapper.toDomain(row) : null;
   }
 }
