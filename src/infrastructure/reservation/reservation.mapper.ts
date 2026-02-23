@@ -1,6 +1,6 @@
 import { Reservation } from '@domain/reservation/reservation.entity';
 
-type ReservationRow = {
+export type ReservationRow = {
   id: string;
   userId: string;
   barberId: string;
