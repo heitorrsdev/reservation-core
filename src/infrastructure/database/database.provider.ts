@@ -1,16 +1,42 @@
-import { drizzle } from 'drizzle-orm/node-postgres';
+import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 
-import { DatabaseUrlNotDefinedError } from './errors/database-url-not-defined.error';
 import * as schema from './schema';
 
-export function createDatabase() {
+let pool: Pool | null = null;
+let db: NodePgDatabase<typeof schema> | null = null;
+
+export function createDatabase(): NodePgDatabase<typeof schema> {
+  if (db) return db;
+
   const url = process.env.DATABASE_URL;
-  if (!url) throw new DatabaseUrlNotDefinedError();
+  if (!url) throw new Error('DATABASE_URL not defined');
 
-  const pool = new Pool({ connectionString: url });
+  pool = new Pool({
+    connectionString: url,
+    max: Number(process.env.DB_POOL_MAX ?? 10),
+  });
 
-  return drizzle(pool, { schema });
+  db = drizzle(pool, { schema });
+
+  return db;
+}
+
+export async function closeDatabase() {
+  if (pool) {
+    await pool.end();
+    pool = null;
+    db = null;
+  }
 }
 
 export type Database = ReturnType<typeof createDatabase>;
+
+export type Transaction = Parameters<Database['transaction']>[0] extends (
+  tx: infer T,
+  ...args: any[]
+) => any
+  ? T
+  : never;
+
+export type DrizzleClient = Database | Transaction;

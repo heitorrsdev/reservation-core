@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm';
 import { Barber } from '@domain/barber/barber.entity';
 import { BarberRepository } from '@domain/barber/barber.repository';
 
-import { Database } from '@infrastructure/database/database.provider';
+import { DrizzleClient } from '@infrastructure/database/database.provider';
 import { DATABASE } from '@infrastructure/database/database.token';
 import { barbers } from '@infrastructure/database/schema/barber';
 
@@ -13,7 +13,7 @@ import { BarberMapper } from './barber.mapper';
 export class BarberDrizzleRepository implements BarberRepository {
   constructor(
     @Inject(DATABASE)
-    private readonly db: Database,
+    private readonly db: DrizzleClient,
   ) {}
 
   async save(barber: Barber): Promise<void> {

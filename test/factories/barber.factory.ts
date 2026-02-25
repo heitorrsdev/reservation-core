@@ -1,30 +1,26 @@
-import { testDb } from '@test/utils/infra/test-database';
+import { TEST_TIME } from '@test/utils/time';
 import { randomUUID } from 'crypto';
 
+import { Barber } from '@domain/barber/barber.entity';
+
+import { Database } from '@infrastructure/database/database.provider';
 import { barbers } from '@infrastructure/database/schema/barber';
 
-import { createUserFactory } from './user.factory';
-
-type CreateBarberInput = {
-  id?: string;
-  name?: string;
-  bio?: string | null;
-  active?: boolean;
-};
-
-export async function createBarberFactory(input: CreateBarberInput = {}) {
+export function buildBarber(input: Partial<Barber> = {}) {
   const id = input.id ?? randomUUID();
 
-  // Ensure user exists first
-  await createUserFactory({ id });
-
-  await testDb.insert(barbers).values({
+  return {
     id,
     name: input.name ?? 'John Barber',
     bio: input.bio ?? null,
     active: input.active ?? true,
-    createdAt: new Date(),
-  });
+    createdAt: input.createdAt ?? TEST_TIME,
+  };
+}
 
-  return { id };
+export async function persistBarber(db: Database, input?: Partial<Barber>) {
+  const data = buildBarber(input);
+
+  await db.insert(barbers).values(data);
+  return data;
 }

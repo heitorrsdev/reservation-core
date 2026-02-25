@@ -2,15 +2,10 @@
 # Variáveis
 # ─────────────────────────────────────────────────────────────
 
-DEV_ENV  = .env.dev
-PROD_ENV = .env.prod
-TEST_ENV = .env.test
-
 DEV_COMPOSE  = docker/docker-compose.dev.yml
 PROD_COMPOSE = docker/docker-compose.prod.yml
 TEST_COMPOSE = docker/docker-compose.test.yml
 
-MIGRATIONS_DIR = migrations
 TREE_IGNORE = node_modules|.git|dist|*.env*
 
 # ─────────────────────────────────────────────────────────────
@@ -18,34 +13,26 @@ TREE_IGNORE = node_modules|.git|dist|*.env*
 # ─────────────────────────────────────────────────────────────
 
 .PHONY: \
-	dev-up dev-down dev-reset dev-migrate \
-	prod-up prod-migrate \
-	test test-up test-down test-reset test-migrate test-run \
+	check-env \
 	lint typecheck build \
-	check-dev-env check-prod-env check-test-env \
+	ci-test \
+	dev-up dev-stop dev-start dev-down dev-reset dev-migrate \
+	prod-up prod-migrate \
+	test-up test-down test-reset test-migrate test \
 	tree
 
 # ─────────────────────────────────────────────────────────────
-# Checks
+# Environment Check
 # ─────────────────────────────────────────────────────────────
 
-check-dev-env:
-	@test -f $(DEV_ENV) || (echo "❌ .env.dev não existe" && exit 1)
-	@grep -q "^DATABASE_URL=" $(DEV_ENV) || \
-		(echo "❌ DATABASE_URL ausente (.env.dev)" && exit 1)
-
-check-prod-env:
-	@test -f $(PROD_ENV) || (echo "❌ .env.prod não existe" && exit 1)
-	@grep -q "^DATABASE_URL=" $(PROD_ENV) || \
-		(echo "❌ DATABASE_URL ausente (.env.prod)" && exit 1)
-
-check-test-env:
-	@test -f $(TEST_ENV) || (echo "❌ .env.test não existe" && exit 1)
-	@grep -q "^DATABASE_URL=" $(TEST_ENV) || \
-		(echo "❌ DATABASE_URL ausente (.env.test)" && exit 1)
+check-env:
+	@if [ -z "$$DATABASE_URL" ]; then \
+		echo "❌ DATABASE_URL não definida"; \
+		exit 1; \
+	fi
 
 # ─────────────────────────────────────────────────────────────
-# CI
+# Quality
 # ─────────────────────────────────────────────────────────────
 
 lint:
@@ -53,6 +40,10 @@ lint:
 
 typecheck:
 	pnpm tsc --noEmit
+
+# ─────────────────────────────────────────────────────────────
+# CI
+# ─────────────────────────────────────────────────────────────
 
 ci-test:
 	make test-reset
@@ -65,7 +56,7 @@ ci-test:
 # DEV
 # ─────────────────────────────────────────────────────────────
 
-dev-up: check-dev-env
+dev-up:
 	@echo "🚧 Subindo Postgres DEV"
 	docker compose -f $(DEV_COMPOSE) up -d
 
@@ -85,27 +76,25 @@ dev-reset:
 	@echo "💥 Resetando ambiente DEV (containers + volumes)"
 	docker compose -f $(DEV_COMPOSE) down -v
 
-dev-migrate:
-	npx dotenv-cli -e $(DEV_ENV) -- \
-		npx ts-node src/infrastructure/scripts/migrate.ts
+dev-migrate: check-env
+	npx ts-node src/infrastructure/scripts/migrate.ts
 
 # ─────────────────────────────────────────────────────────────
 # PROD
 # ─────────────────────────────────────────────────────────────
 
-prod-up: check-prod-env
+prod-up:
 	@echo "🚀 Subindo Postgres PROD"
 	docker compose -f $(PROD_COMPOSE) up -d
 
-prod-migrate: check-prod-env
-	npx dotenv-cli -e $(PROD_ENV) -- \
-		npx ts-node src/infrastructure/scripts/migrate.ts
+prod-migrate: check-env
+	npx ts-node src/infrastructure/scripts/migrate.ts
 
-# ────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────
 # TEST
-# ────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────
 
-test-up: check-test-env
+test-up:
 	@echo "🧪 Subindo Postgres TEST"
 	docker compose -f $(TEST_COMPOSE) up -d
 
@@ -117,13 +106,11 @@ test-reset:
 	@echo "💥 Resetando ambiente TEST (containers + volumes)"
 	docker compose -f $(TEST_COMPOSE) down -v
 
-test-migrate: check-test-env
-	npx dotenv-cli -e $(TEST_ENV) -- \
-		npx ts-node src/infrastructure/scripts/migrate.ts
+test-migrate: check-env
+	npx ts-node src/infrastructure/scripts/migrate.ts
 
 test:
-	npx dotenv-cli -e $(TEST_ENV) -- \
-		pnpm jest
+	pnpm jest
 
 # ─────────────────────────────────────────────────────────────
 # Utils

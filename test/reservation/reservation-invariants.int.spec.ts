@@ -1,5 +1,5 @@
-import { createBarberFactory } from '@test/factories/barber.factory';
-import { createUserFactory } from '@test/factories/user.factory';
+import { persistBarber } from '@test/factories/barber.factory';
+import { persistUser } from '@test/factories/user.factory';
 import { testDb } from '@test/utils/infra/test-database';
 import { truncateTestDatabase } from '@test/utils/infra/truncate-test-db';
 import { randomUUID } from 'crypto';
@@ -21,8 +21,8 @@ describe('Reservation invariants (integration)', () => {
   });
 
   it('should persist a valid reservation', async () => {
-    const user = await createUserFactory();
-    const barber = await createBarberFactory();
+    const user = await persistUser(testDb);
+    const barber = await persistBarber(testDb, { id: user.id });
 
     const reservation = Reservation.create({
       id: randomUUID(),
@@ -30,7 +30,7 @@ describe('Reservation invariants (integration)', () => {
       userId: user.id,
       startTime: new Date('2030-01-01T10:00:00Z'),
       endTime: new Date('2030-01-01T11:00:00Z'),
-      createdAt: new Date(),
+      createdAt: new Date('2030-01-01T09:00:00Z'),
     });
 
     await repository.save(reservation);
@@ -41,9 +41,11 @@ describe('Reservation invariants (integration)', () => {
   });
 
   it('should throw ReservationConflictError when slot is already taken', async () => {
-    const barber = await createBarberFactory();
-    const userA = await createUserFactory();
-    const userB = await createUserFactory();
+    const barberUser = await persistUser(testDb);
+    const barber = await persistBarber(testDb, { id: barberUser.id });
+
+    const userA = await persistUser(testDb);
+    const userB = await persistUser(testDb);
 
     const start = new Date('2030-01-01T10:00:00Z');
     const end = new Date('2030-01-01T11:00:00Z');
@@ -54,7 +56,7 @@ describe('Reservation invariants (integration)', () => {
       userId: userA.id,
       startTime: start,
       endTime: end,
-      createdAt: new Date(),
+      createdAt: new Date('2030-01-01T09:00:00Z'),
     });
 
     await repository.save(first);
@@ -65,7 +67,7 @@ describe('Reservation invariants (integration)', () => {
       userId: userB.id,
       startTime: start,
       endTime: end,
-      createdAt: new Date(),
+      createdAt: new Date('2030-01-01T09:00:00Z'),
     });
 
     await expect(repository.save(conflicting)).rejects.toBeInstanceOf(
