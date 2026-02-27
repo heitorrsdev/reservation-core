@@ -1,9 +1,7 @@
 import type { Config } from 'jest';
 
 const config: Config = {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
-  globalSetup: '<rootDir>/test/setup/global-setup.ts',
+  maxWorkers: 1,
   moduleNameMapper: {
     '^@domain/(.*)$': '<rootDir>/src/domain/$1',
     '^@application/(.*)$': '<rootDir>/src/application/$1',
@@ -11,6 +9,8 @@ const config: Config = {
     '^@http/(.*)$': '<rootDir>/src/http/$1',
     '^@test/(.*)$': '<rootDir>/test/$1',
   },
+  preset: 'ts-jest',
+  testEnvironment: 'node',
 };
 
 export default config;

@@ -1,24 +1,28 @@
-import { testDb } from '@test/utils/infra/test-database';
+import { TEST_TIME } from '@test/utils/time';
 import { randomUUID } from 'crypto';
 
+import { Database } from '@infrastructure/database/database.provider';
 import { users } from '@infrastructure/database/schema/user';
 
-type CreateUserInput = {
+type persistUserInput = {
   id?: string;
   email?: string;
   passwordHash?: string;
   createdAt?: Date;
 };
 
-export async function createUserFactory(input: CreateUserInput = {}) {
+export function buildUser(input: persistUserInput = {}) {
   const id = input.id ?? randomUUID();
-
-  await testDb.insert(users).values({
+  return {
     id,
-    email: input.email ?? `${id}@test.com`,
+    email: input.email ?? `user-${id}@example.com`,
     passwordHash: input.passwordHash ?? 'hash',
-    createdAt: input.createdAt ?? new Date(),
-  });
+    createdAt: input.createdAt ?? TEST_TIME,
+  };
+}
 
-  return { id };
+export async function persistUser(db: Database, input?: persistUserInput) {
+  const data = buildUser(input);
+  await db.insert(users).values(data);
+  return data;
 }

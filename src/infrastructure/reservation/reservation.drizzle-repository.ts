@@ -5,7 +5,7 @@ import { ReservationConflictError } from '@domain/reservation/errors/reservation
 import { Reservation } from '@domain/reservation/reservation.entity';
 import { ReservationRepository } from '@domain/reservation/reservation.repository';
 
-import { Database } from '@infrastructure/database/database.provider';
+import { DrizzleClient } from '@infrastructure/database/database.provider';
 import { DATABASE } from '@infrastructure/database/database.token';
 import { PostgresErrorMapper } from '@infrastructure/database/postgres-error.mapper';
 import { reservations } from '@infrastructure/database/schema/reservation';
@@ -13,14 +13,14 @@ import { reservations } from '@infrastructure/database/schema/reservation';
 import { ReservationMapper, ReservationRow } from './reservation.mapper';
 
 export class ReservationDrizzleRepository implements ReservationRepository {
-  constructor(@Inject(DATABASE) private readonly db: Database) {}
+  constructor(@Inject(DATABASE) private readonly db: DrizzleClient) {}
 
   async save(reservation: Reservation): Promise<void> {
     try {
       const data = ReservationMapper.toPersistence(reservation);
       await this.db.insert(reservations).values(data);
     } catch (error: unknown) {
-      if (PostgresErrorMapper.isUniqueViolation(error)) {
+      if (PostgresErrorMapper.isExclusionViolation(error)) {
         throw new ReservationConflictError();
       }
 

@@ -21,7 +21,7 @@ Drizzle ORM wraps PostgreSQL errors, requiring custom logic to extract the under
 
 2. **Repositories will depend only on semantic error checks**
 
-   * Example: `PostgresErrorMapper.isUniqueViolation(error)`
+   * Example: `PostgresErrorMapper.isExclusionViolation(error)`
    * Repositories will no longer parse error objects manually.
 
 3. **The mapper remains an infrastructure concern**

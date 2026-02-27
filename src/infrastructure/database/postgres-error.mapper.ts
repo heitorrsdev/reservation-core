@@ -29,7 +29,7 @@ export class PostgresErrorMapper {
     return null;
   }
 
-  static isUniqueViolation(error: unknown): boolean {
+  static isExclusionViolation(error: unknown): boolean {
     return this.extractCode(error) === '23P01';
   }
 

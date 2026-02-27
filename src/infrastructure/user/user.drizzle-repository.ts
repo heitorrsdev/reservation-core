@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm';
 import { User } from '@domain/user/user.entity';
 import { UserRepository } from '@domain/user/user.repository';
 
-import { Database } from '@infrastructure/database/database.provider';
+import { DrizzleClient } from '@infrastructure/database/database.provider';
 import { DATABASE } from '@infrastructure/database/database.token';
 import { UniqueConstraintViolationError } from '@infrastructure/database/errors/unique-constraint-violation.error';
 import { users } from '@infrastructure/database/schema/user';
@@ -13,7 +13,7 @@ import { UserMapper } from './user.mapper';
 
 @Injectable()
 export class UserDrizzleRepository implements UserRepository {
-  constructor(@Inject(DATABASE) private readonly db: Database) {}
+  constructor(@Inject(DATABASE) private readonly db: DrizzleClient) {}
   async findByEmail(email: string): Promise<User | null> {
     const result = await this.db
       .select()
