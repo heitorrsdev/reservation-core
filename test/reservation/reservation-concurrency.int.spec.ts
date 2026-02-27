@@ -42,8 +42,6 @@ it('should prevent double booking under real concurrency', async () => {
 
   const results = await Promise.allSettled(tasks);
 
-  console.log(results);
-
   const success = results.filter((r) => r.status === 'fulfilled');
   const failed = results.filter((r) => r.status === 'rejected');
 

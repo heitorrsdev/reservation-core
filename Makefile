@@ -96,7 +96,7 @@ prod-migrate: check-env
 
 test-up:
 	@echo "🧪 Subindo Postgres TEST"
-	docker compose -f $(TEST_COMPOSE) up -d
+	docker compose -f $(TEST_COMPOSE) up -d --wait
 
 test-down:
 	@echo "⬇️ Removendo containers TEST (mantendo volumes)"

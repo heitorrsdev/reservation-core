@@ -2,7 +2,7 @@ services:
   postgres_test:
     image: postgres:16
     container_name: barber_test_db
-    restart: always
+    restart: no
     environment:
       POSTGRES_DB: barber_test
       POSTGRES_USER: test
@@ -11,6 +11,11 @@ services:
       - "5433:5432"
     volumes:
       - pg_test_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d barber_test"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
 
 volumes:
   pg_test_data:
