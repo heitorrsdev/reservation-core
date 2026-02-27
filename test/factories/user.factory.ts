@@ -1,27 +1,25 @@
-import { TEST_TIME } from '@test/utils/time';
 import { randomUUID } from 'crypto';
 
 import { Database } from '@infrastructure/database/database.provider';
 import { users } from '@infrastructure/database/schema/user';
 
-type persistUserInput = {
-  id?: string;
-  email?: string;
-  passwordHash?: string;
-  createdAt?: Date;
-};
+type UserInsert = typeof users.$inferInsert;
 
-export function buildUser(input: persistUserInput = {}) {
+export function buildUser(input: Partial<UserInsert> = {}) {
   const id = input.id ?? randomUUID();
+  const email = input.email ?? `user-${id}@example.com`;
+  const passwordHash = input.passwordHash ?? 'hashed-password';
+  const createdAt = input.createdAt ?? new Date();
+
   return {
     id,
-    email: input.email ?? `user-${id}@example.com`,
-    passwordHash: input.passwordHash ?? 'hash',
-    createdAt: input.createdAt ?? TEST_TIME,
+    email,
+    passwordHash,
+    createdAt,
   };
 }
 
-export async function persistUser(db: Database, input?: persistUserInput) {
+export async function persistUser(db: Database, input?: Partial<UserInsert>) {
   const data = buildUser(input);
   await db.insert(users).values(data);
   return data;

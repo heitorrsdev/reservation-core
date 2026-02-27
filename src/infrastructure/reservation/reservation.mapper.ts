@@ -1,16 +1,11 @@
 import { Reservation } from '@domain/reservation/reservation.entity';
 
-export type ReservationRow = {
-  id: string;
-  userId: string;
-  barberId: string;
-  startTime: Date;
-  endTime: Date;
-  createdAt: Date;
-};
+import { reservations } from '@infrastructure/database/schema';
 
+type ReservationSelect = typeof reservations.$inferSelect;
+type ReservationInsert = typeof reservations.$inferInsert;
 export class ReservationMapper {
-  static toDomain(row: ReservationRow): Reservation {
+  static toDomain(row: ReservationSelect): Reservation {
     return Reservation.create({
       id: row.id,
       userId: row.userId,
@@ -20,7 +15,7 @@ export class ReservationMapper {
     });
   }
 
-  static toPersistence(reservation: Reservation): ReservationRow {
+  static toPersistence(reservation: Reservation): ReservationInsert {
     return {
       id: reservation.id,
       userId: reservation.userId,

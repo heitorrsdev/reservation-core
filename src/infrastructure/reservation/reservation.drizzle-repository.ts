@@ -10,7 +10,7 @@ import { DATABASE } from '@infrastructure/database/database.token';
 import { PostgresErrorMapper } from '@infrastructure/database/postgres-error.mapper';
 import { reservations } from '@infrastructure/database/schema/reservation';
 
-import { ReservationMapper, ReservationRow } from './reservation.mapper';
+import { ReservationMapper } from './reservation.mapper';
 
 export class ReservationDrizzleRepository implements ReservationRepository {
   constructor(@Inject(DATABASE) private readonly db: DrizzleClient) {}
@@ -29,7 +29,7 @@ export class ReservationDrizzleRepository implements ReservationRepository {
   }
 
   async findById(id: string): Promise<Reservation | null> {
-    const [row]: ReservationRow[] = await this.db
+    const [row] = await this.db
       .select()
       .from(reservations)
       .where(eq(reservations.id, id));

@@ -7,7 +7,5 @@ export const barbers = pgTable('barbers', {
   bio: text('bio'),
   active: boolean('active').notNull().default(true),
 
-  createdAt: timestamp('created_at', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
 });

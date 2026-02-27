@@ -1,15 +1,11 @@
 import { Barber } from '@domain/barber/barber.entity';
 
-type BarberRow = {
-  id: string;
-  name: string;
-  bio: string | null;
-  active: boolean;
-  createdAt: Date;
-};
+import { barbers } from '@infrastructure/database/schema';
 
+type BarberSelect = typeof barbers.$inferSelect;
+type BarberInsert = typeof barbers.$inferInsert;
 export class BarberMapper {
-  static toDomain(row: BarberRow): Barber {
+  static toDomain(row: BarberSelect): Barber {
     return Barber.create({
       userId: row.id,
       name: row.name,
@@ -18,7 +14,7 @@ export class BarberMapper {
     });
   }
 
-  static toPersistence(barber: Barber): BarberRow {
+  static toPersistence(barber: Barber): BarberInsert {
     return {
       id: barber.id,
       name: barber.name,
