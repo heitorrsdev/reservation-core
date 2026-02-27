@@ -1,24 +1,30 @@
-import { TEST_TIME } from '@test/utils/time';
 import { randomUUID } from 'crypto';
-
-import { Barber } from '@domain/barber/barber.entity';
 
 import { Database } from '@infrastructure/database/database.provider';
 import { barbers } from '@infrastructure/database/schema/barber';
 
-export function buildBarber(input: Partial<Barber> = {}) {
+type BarberInsert = typeof barbers.$inferInsert;
+
+export function buildBarber(input: Partial<BarberInsert> = {}) {
   const id = input.id ?? randomUUID();
+  const name = input.name ?? 'John Doe';
+  const bio = input.bio ?? null;
+  const active = input.active ?? true;
+  const createdAt = input.createdAt ?? new Date();
 
   return {
     id,
-    name: input.name ?? 'John Barber',
-    bio: input.bio ?? null,
-    active: input.active ?? true,
-    createdAt: input.createdAt ?? TEST_TIME,
+    name,
+    bio,
+    active,
+    createdAt,
   };
 }
 
-export async function persistBarber(db: Database, input?: Partial<Barber>) {
+export async function persistBarber(
+  db: Database,
+  input?: Partial<BarberInsert>,
+) {
   const data = buildBarber(input);
 
   await db.insert(barbers).values(data);

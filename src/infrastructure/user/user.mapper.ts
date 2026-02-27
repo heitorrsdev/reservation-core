@@ -1,13 +1,12 @@
 import { User } from '@domain/user/user.entity';
 
-type userRow = {
-  id: string;
-  email: string;
-  passwordHash: string;
-  createdAt: Date;
-};
+import { users } from '@infrastructure/database/schema/user';
+
+type UserSelect = typeof users.$inferSelect;
+type UserInsert = typeof users.$inferInsert;
+
 export class UserMapper {
-  static toDomain(row: userRow): User {
+  static toDomain(row: UserSelect): User {
     return User.create({
       id: row.id,
       email: row.email,
@@ -16,7 +15,7 @@ export class UserMapper {
     });
   }
 
-  static toPersistence(user: User): userRow {
+  static toPersistence(user: User): UserInsert {
     return {
       id: user.id,
       email: user.email.value,

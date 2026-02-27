@@ -36,6 +36,8 @@ The decisions described here **reflect the actual state of the code at the time 
 | 0007 | Barber as Specialized User           |
 | 0008 | Drizzle Schema in Database Provider  |
 | 0009 | Postgres Error Mapper                |
+| 0010 | UUID as Identifier Type              |
+
 
 
 ---
