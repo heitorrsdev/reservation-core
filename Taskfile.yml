@@ -1,0 +1,126 @@
+version: '3'
+
+vars:
+  DEV_COMPOSE: docker/docker-compose.dev.yml
+  PROD_COMPOSE: docker/docker-compose.prod.yml
+  TEST_COMPOSE: docker/docker-compose.test.yml
+  TREE_IGNORE: node_modules|.git|dist|*.env*
+
+tasks:
+
+  # ─────────────────────────────────────────────
+  # Environment
+  # ─────────────────────────────────────────────
+
+  check-env:
+    cmds:
+      - |
+        if [ -z "$DATABASE_URL" ]; then
+          echo "❌ DATABASE_URL não definida"
+          exit 1
+        fi
+
+  # ─────────────────────────────────────────────
+  # Quality
+  # ─────────────────────────────────────────────
+
+  lint:
+    cmds:
+      - pnpm lint
+
+  typecheck:
+    cmds:
+      - pnpm tsc --noEmit
+
+  # ─────────────────────────────────────────────
+  # CI
+  # ─────────────────────────────────────────────
+
+  ci-test:
+    cmds:
+      - task test-reset
+      - task test-up
+      - task test-migrate
+      - pnpm jest
+      - task test-down
+
+  # ─────────────────────────────────────────────
+  # DEV
+  # ─────────────────────────────────────────────
+
+  dev-up:
+    cmds:
+      - echo "🚧 Subindo Postgres DEV"
+      - docker compose -f {{.DEV_COMPOSE}} up -d
+
+  dev-stop:
+    cmds:
+      - echo "⏹️ Parando containers DEV"
+      - docker compose -f {{.DEV_COMPOSE}} stop
+
+  dev-start:
+    cmds:
+      - echo "▶️ Iniciando containers DEV"
+      - docker compose -f {{.DEV_COMPOSE}} start
+
+  dev-down:
+    cmds:
+      - echo "⬇️ Removendo containers DEV (mantendo volumes)"
+      - docker compose -f {{.DEV_COMPOSE}} down
+
+  dev-reset:
+    cmds:
+      - echo "💥 Resetando ambiente DEV (containers + volumes)"
+      - docker compose -f {{.DEV_COMPOSE}} down -v
+
+  dev-migrate:
+    deps: [check-env]
+    cmds:
+      - npx ts-node src/infrastructure/scripts/migrate.ts
+
+  # ─────────────────────────────────────────────
+  # PROD
+  # ─────────────────────────────────────────────
+
+  prod-up:
+    cmds:
+      - echo "🚀 Subindo Postgres PROD"
+      - docker compose -f {{.PROD_COMPOSE}} up -d
+
+  prod-migrate:
+    deps: [check-env]
+    cmds:
+      - npx ts-node src/infrastructure/scripts/migrate.ts
+
+  # ─────────────────────────────────────────────
+  # TEST
+  # ─────────────────────────────────────────────
+
+  test-up:
+    cmds:
+      - echo "🧪 Subindo Postgres TEST"
+      - docker compose -f {{.TEST_COMPOSE}} up -d --wait
+
+  test-down:
+    cmds:
+      - echo "⬇️ Removendo containers TEST (mantendo volumes)"
+      - docker compose -f {{.TEST_COMPOSE}} down
+
+  test-reset:
+    cmds:
+      - echo "💥 Resetando ambiente TEST (containers + volumes)"
+      - docker compose -f {{.TEST_COMPOSE}} down -v
+
+  test-migrate:
+    deps: [check-env]
+    cmds:
+      - npx ts-node src/infrastructure/scripts/migrate.ts
+
+  # ─────────────────────────────────────────────
+  # Utils
+  # ─────────────────────────────────────────────
+
+  tree:
+    cmds:
+      - echo "🌳 Estrutura de pastas"
+      - tree -a -L 6 -I "{{.TREE_IGNORE}}" --prune
