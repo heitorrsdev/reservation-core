@@ -20,6 +20,19 @@ tasks:
           exit 1
         fi
 
+  migrate:
+    deps: [check-env]
+    cmds:
+      - pnpm migrate
+
+  # ─────────────────────────────────────────────
+  # Helpers
+  # ─────────────────────────────────────────────
+
+  compose:
+    cmds:
+      - docker compose -f {{.FILE}} {{.CMD}}
+
   # ─────────────────────────────────────────────
   # Quality
   # ─────────────────────────────────────────────
@@ -40,8 +53,9 @@ tasks:
     cmds:
       - task test-reset
       - task test-up
-      - task test-migrate
-      - pnpm jest
+      - task migrate
+      - |
+        pnpm jest || (task test-down && exit 1)
       - task test-down
 
   # ─────────────────────────────────────────────
@@ -51,32 +65,28 @@ tasks:
   dev-up:
     cmds:
       - echo "🚧 Subindo Postgres DEV"
-      - docker compose -f {{.DEV_COMPOSE}} up -d
+      - task compose FILE={{.DEV_COMPOSE}} CMD="up -d"
 
   dev-stop:
     cmds:
       - echo "⏹️ Parando containers DEV"
-      - docker compose -f {{.DEV_COMPOSE}} stop
+      - task compose FILE={{.DEV_COMPOSE}} CMD="stop"
 
   dev-start:
     cmds:
       - echo "▶️ Iniciando containers DEV"
-      - docker compose -f {{.DEV_COMPOSE}} start
+      - task compose FILE={{.DEV_COMPOSE}} CMD="start"
 
   dev-down:
     cmds:
       - echo "⬇️ Removendo containers DEV (mantendo volumes)"
-      - docker compose -f {{.DEV_COMPOSE}} down
+      - task compose FILE={{.DEV_COMPOSE}} CMD="down"
 
   dev-reset:
     cmds:
       - echo "💥 Resetando ambiente DEV (containers + volumes)"
-      - docker compose -f {{.DEV_COMPOSE}} down -v
+      - task compose FILE={{.DEV_COMPOSE}} CMD="down -v"
 
-  dev-migrate:
-    deps: [check-env]
-    cmds:
-      - npx ts-node src/infrastructure/scripts/migrate.ts
 
   # ─────────────────────────────────────────────
   # PROD
@@ -85,12 +95,8 @@ tasks:
   prod-up:
     cmds:
       - echo "🚀 Subindo Postgres PROD"
-      - docker compose -f {{.PROD_COMPOSE}} up -d
+      - task compose FILE={{.PROD_COMPOSE}} CMD="up -d"
 
-  prod-migrate:
-    deps: [check-env]
-    cmds:
-      - npx ts-node src/infrastructure/scripts/migrate.ts
 
   # ─────────────────────────────────────────────
   # TEST
@@ -99,22 +105,18 @@ tasks:
   test-up:
     cmds:
       - echo "🧪 Subindo Postgres TEST"
-      - docker compose -f {{.TEST_COMPOSE}} up -d --wait
+      - task compose FILE={{.TEST_COMPOSE}} CMD="up -d --wait"
 
   test-down:
     cmds:
       - echo "⬇️ Removendo containers TEST (mantendo volumes)"
-      - docker compose -f {{.TEST_COMPOSE}} down
+      - task compose FILE={{.TEST_COMPOSE}} CMD="down"
 
   test-reset:
     cmds:
       - echo "💥 Resetando ambiente TEST (containers + volumes)"
-      - docker compose -f {{.TEST_COMPOSE}} down -v
+      - task compose FILE={{.TEST_COMPOSE}} CMD="down -v"
 
-  test-migrate:
-    deps: [check-env]
-    cmds:
-      - npx ts-node src/infrastructure/scripts/migrate.ts
 
   # ─────────────────────────────────────────────
   # Utils
