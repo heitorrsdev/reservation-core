@@ -112,14 +112,14 @@ This guarantees test isolation and reproducibility.
 
 ---
 
-## Makefile Test Commands
+## Taskfile Test Commands
 
 | Command             | Description                     |
 | ------------------- | ------------------------------- |
-| `make test-up`      | Start PostgreSQL test container |
-| `make test-reset`   | Drop and recreate schema        |
-| `make test-migrate` | Execute SQL migrations          |
-| `make test`         | Run Jest test suite             |
+| `task test-reset`   | Drop and recreate schema        |
+| `task test-up`      | Start PostgreSQL test container |
+| `task test-migrate` | Execute SQL migrations          |
+| `task test`         | Run Jest test suite             |
 
 ---
 
