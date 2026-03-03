@@ -3,6 +3,7 @@ import { UserRepository } from '@domain/user/user.repository';
 import { DrizzleClient } from '@infrastructure/database/database.provider';
 import { DATABASE } from '@infrastructure/database/database.token';
 import { UniqueConstraintViolationError } from '@infrastructure/database/errors/unique-constraint-violation.error';
+import { PostgresErrorMapper } from '@infrastructure/database/postgres-error.mapper';
 import { users } from '@infrastructure/database/schema/user';
 import { Inject, Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
@@ -55,12 +56,7 @@ export class UserDrizzleRepository implements UserRepository {
         createdAt: user.createdAt,
       });
     } catch (error: unknown) {
-      if (
-        typeof error === 'object' &&
-        error !== null &&
-        'code' in error &&
-        error.code === '23505'
-      ) {
+      if (PostgresErrorMapper.isUniqueViolation(error)) {
         throw new UniqueConstraintViolationError('users_email_key');
       }
 
