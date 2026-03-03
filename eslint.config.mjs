@@ -52,7 +52,7 @@ export default tseslint.config(
       // =====================
       // TypeScript
       // =====================
-      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-explicit-any': 'error',
 
       // =====================
       // Import sorting
