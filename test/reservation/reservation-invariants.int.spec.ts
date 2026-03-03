@@ -1,13 +1,11 @@
+import { ReservationConflictError } from '@domain/reservation/errors/reservation-conflict.error';
+import { Reservation } from '@domain/reservation/reservation.entity';
+import { ReservationDrizzleRepository } from '@infrastructure/reservation/reservation.drizzle-repository';
 import { persistBarber } from '@test/factories/barber.factory';
 import { persistUser } from '@test/factories/user.factory';
 import { testDb } from '@test/utils/infra/test-database';
 import { truncateTestDatabase } from '@test/utils/infra/truncate-test-db';
 import { randomUUID } from 'crypto';
-
-import { ReservationConflictError } from '@domain/reservation/errors/reservation-conflict.error';
-import { Reservation } from '@domain/reservation/reservation.entity';
-
-import { ReservationDrizzleRepository } from '@infrastructure/reservation/reservation.drizzle-repository';
 
 describe('Reservation invariants (integration)', () => {
   let repository: ReservationDrizzleRepository;

@@ -1,9 +1,7 @@
+import { CreateUserUseCase } from '@application/user/create-user.usecase';
+import { InfrastructureModule } from '@infrastructure/infrastructure.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-
-import { CreateUserUseCase } from '@application/user/create-user.usecase';
-
-import { InfrastructureModule } from '@infrastructure/infrastructure.module';
 
 @Module({
   imports: [

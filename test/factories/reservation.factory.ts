@@ -1,8 +1,7 @@
-import { TEST_TIME } from '@test/utils/time';
-import { randomUUID } from 'crypto';
-
 import { Database } from '@infrastructure/database/database.provider';
 import { reservations } from '@infrastructure/database/schema/reservation';
+import { TEST_TIME } from '@test/utils/time';
+import { randomUUID } from 'crypto';
 
 type ReservationInsert = typeof reservations.$inferInsert;
 type ReservationFactoryInput = { userId: string; barberId: string } & Partial<

@@ -1,10 +1,9 @@
-import { Inject } from '@nestjs/common';
-
 import { Barber } from '@domain/barber/barber.entity';
 import { BarberRepository } from '@domain/barber/barber.repository';
 import { UserAlreadyBarberError } from '@domain/barber/errors/user-already-barber.error';
 import { UserNotFoundError } from '@domain/user/errors/user-not-found.error';
 import { UserRepository } from '@domain/user/user.repository';
+import { Inject } from '@nestjs/common';
 
 import { BARBER_REPOSITORY } from './barber-repository.token';
 import { CreateBarberCommand } from './create-barber.command';

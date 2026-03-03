@@ -1,12 +1,10 @@
-import { Inject } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
-
 import { Barber } from '@domain/barber/barber.entity';
 import { BarberRepository } from '@domain/barber/barber.repository';
-
 import { DrizzleClient } from '@infrastructure/database/database.provider';
 import { DATABASE } from '@infrastructure/database/database.token';
 import { barbers } from '@infrastructure/database/schema/barber';
+import { Inject } from '@nestjs/common';
+import { eq } from 'drizzle-orm';
 
 import { BarberMapper } from './barber.mapper';
 
