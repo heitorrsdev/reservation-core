@@ -1,0 +1,8 @@
+ALTER TABLE users
+  ALTER COLUMN created_at DROP DEFAULT;
+
+ALTER TABLE barbers
+  ALTER COLUMN created_at DROP DEFAULT;
+
+ALTER TABLE reservations
+  ALTER COLUMN created_at DROP DEFAULT;
