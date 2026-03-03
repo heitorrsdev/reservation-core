@@ -29,16 +29,12 @@ export class PostgresErrorMapper {
     return null;
   }
 
-  static isExclusionViolation(error: unknown): boolean {
-    return this.extractCode(error) === '23P01';
+  static isNotNullViolation(error: unknown): boolean {
+    return this.extractCode(error) === '23502';
   }
 
   static isForeignKeyViolation(error: unknown): boolean {
     return this.extractCode(error) === '23503';
-  }
-
-  static isNotNullViolation(error: unknown): boolean {
-    return this.extractCode(error) === '23502';
   }
 
   static isUniqueViolation(error: unknown): boolean {
@@ -47,5 +43,9 @@ export class PostgresErrorMapper {
 
   static isCheckViolation(error: unknown): boolean {
     return this.extractCode(error) === '23514';
+  }
+
+  static isExclusionViolation(error: unknown): boolean {
+    return this.extractCode(error) === '23P01';
   }
 }
