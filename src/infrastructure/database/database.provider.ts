@@ -34,8 +34,8 @@ export type Database = ReturnType<typeof createDatabase>;
 
 export type Transaction = Parameters<Database['transaction']>[0] extends (
   tx: infer T,
-  ...args: any[]
-) => any
+  ...args: unknown[]
+) => unknown
   ? T
   : never;
 
