@@ -1,29 +1,34 @@
 // @ts-check
-import eslint from '@eslint/js';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
+import boundaries from 'eslint-plugin-boundaries';
 
 export default tseslint.config(
   {
     ignores: ['eslint.config.mjs'],
   },
 
-  eslint.configs.recommended,
-  ...tseslint.configs.recommendedTypeChecked,
+  ...tseslint.configs.recommended,
+
+  // Prettier
   eslintPluginPrettierRecommended,
 
   {
     languageOptions: {
       globals: {
         ...globals.node,
-        ...globals.jest,
       },
-      sourceType: 'module',
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
+    },
+  },
+
+  // Jest only for tests
+  {
+    files: ['**/*.spec.ts', '**/*.test.ts'],
+    languageOptions: {
+      globals: {
+        ...globals.jest,
       },
     },
   },
@@ -31,84 +36,64 @@ export default tseslint.config(
   {
     plugins: {
       'simple-import-sort': simpleImportSort,
+      boundaries,
     },
+
+    settings: {
+      'boundaries/elements': [
+        { type: 'domain', pattern: 'src/domain/**' },
+        { type: 'application', pattern: 'src/application/**' },
+        { type: 'infrastructure', pattern: 'src/infrastructure/**' },
+        { type: 'http', pattern: 'src/http/**' },
+      ],
+    },
+
     rules: {
-      // --- Typescript ---
+      // =====================
+      // TypeScript
+      // =====================
       '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-floating-promises': 'warn',
-      '@typescript-eslint/no-unsafe-argument': 'warn',
 
-      // --- Prettier ---
-      'prettier/prettier': ['error', { endOfLine: 'auto' }],
-
-      // --- Import sorting ---
+      // =====================
+      // Import sorting
+      // =====================
       'simple-import-sort/imports': [
         'error',
         {
           groups: [
             ['^node:'],
             ['^@?\\w'],
-            ['^@domain/'],
-            ['^@application/'],
-            ['^@infrastructure/'],
-            ['^@http/'],
             ['^\\.'],
             ['^\\u0000'],
           ],
         },
       ],
       'simple-import-sort/exports': 'error',
-    },
-  },
 
-  // =====================
-  // Domain
-  // =====================
-  {
-    files: ['src/domain/**/*.{ts,tsx}'],
-    rules: {
-      'no-restricted-imports': [
+      // =====================
+      // Architectural boundaries
+      // =====================
+      'boundaries/element-types': [
         'error',
         {
-          patterns: [
-            '@application/*',
-            '@infrastructure/*',
-            '@http/*',
-          ],
-        },
-      ],
-    },
-  },
-
-  // =====================
-  // Application
-  // =====================
-  {
-    files: ['src/application/**/*.{ts,tsx}'],
-    rules: {
-      'no-restricted-imports': [
-        'error',
-        {
-          patterns: [
-            '@infrastructure/*',
-            '@http/*',
-          ],
-        },
-      ],
-    },
-  },
-
-  // =====================
-  // HTTP
-  // =====================
-  {
-    files: ['src/http/**/*.{ts,tsx}'],
-    rules: {
-      'no-restricted-imports': [
-        'error',
-        {
-          patterns: [
-            '@infrastructure/*',
+          default: 'disallow',
+          rules: [
+            {
+              from: 'domain',
+              allow: ['domain'],
+            },
+            {
+              from: 'application',
+              allow: ['domain', 'application'],
+            },
+            {
+              from: 'http',
+              allow: ['domain', 'application', 'http'],
+            },
+            {
+              from: 'infrastructure',
+              allow: ['domain', 'application', 'infrastructure'],
+            },
           ],
         },
       ],
