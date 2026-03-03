@@ -41,6 +41,10 @@ export class PostgresErrorMapper {
     return this.extractCode(error) === '23502';
   }
 
+  static isUniqueViolation(error: unknown): boolean {
+    return this.extractCode(error) === '23505';
+  }
+
   static isCheckViolation(error: unknown): boolean {
     return this.extractCode(error) === '23514';
   }
