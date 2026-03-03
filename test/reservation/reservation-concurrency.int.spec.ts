@@ -1,12 +1,10 @@
+import { ReservationConflictError } from '@domain/reservation/errors/reservation-conflict.error';
+import { ReservationDrizzleRepository } from '@infrastructure/reservation/reservation.drizzle-repository';
 import { persistBarber } from '@test/factories/barber.factory';
 import { buildReservation } from '@test/factories/reservation.factory';
 import { persistUser } from '@test/factories/user.factory';
 import { Barrier } from '@test/utils/concurrency-barrier';
 import { testDb } from '@test/utils/infra/test-database';
-
-import { ReservationConflictError } from '@domain/reservation/errors/reservation-conflict.error';
-
-import { ReservationDrizzleRepository } from '@infrastructure/reservation/reservation.drizzle-repository';
 
 it('should prevent double booking under real concurrency', async () => {
   const barberUser = await persistUser(testDb);

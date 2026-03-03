@@ -1,7 +1,6 @@
-import { randomUUID } from 'crypto';
-
 import { Database } from '@infrastructure/database/database.provider';
 import { barbers } from '@infrastructure/database/schema/barber';
+import { randomUUID } from 'crypto';
 
 type BarberInsert = typeof barbers.$inferInsert;
 

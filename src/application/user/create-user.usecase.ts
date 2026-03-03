@@ -1,10 +1,8 @@
-import { Inject } from '@nestjs/common';
-
+import { ConflictError } from '@application/errors/conflict.error';
 import { UserAlreadyExistsError } from '@domain/user/errors/user-already-exists.error';
 import { User } from '@domain/user/user.entity';
 import { UserRepository } from '@domain/user/user.repository';
-
-import { ConflictError } from '@application/errors/conflict.error';
+import { Inject } from '@nestjs/common';
 
 import { CreateUserCommand } from './create-user.command';
 import { PasswordHasher } from './password-hasher';

@@ -1,5 +1,4 @@
 import { Barber } from '@domain/barber/barber.entity';
-
 import { barbers } from '@infrastructure/database/schema';
 
 type BarberSelect = typeof barbers.$inferSelect;

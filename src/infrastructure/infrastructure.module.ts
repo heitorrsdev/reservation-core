@@ -1,8 +1,7 @@
-import { Module } from '@nestjs/common';
-
 import { BARBER_REPOSITORY } from '@application/barber/barber-repository.token';
 import { PASSWORD_HASHER } from '@application/user/password-hasher.token';
 import { USER_REPOSITORY } from '@application/user/user-repository.token';
+import { Module } from '@nestjs/common';
 
 import { BarberDrizzleRepository } from './barber/barber.drizzle-repository';
 import { DatabaseModule } from './database/database.module';
