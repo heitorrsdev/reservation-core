@@ -1,10 +1,12 @@
 import { BARBER_REPOSITORY } from '@application/barber/barber-repository.token';
+import { RESERVATION_REPOSITORY } from '@application/reservation/reservation-repository.token';
 import { PASSWORD_HASHER } from '@application/user/password-hasher.token';
 import { USER_REPOSITORY } from '@application/user/user-repository.token';
 import { Module } from '@nestjs/common';
 
 import { BarberDrizzleRepository } from './barber/barber.drizzle-repository';
 import { DatabaseModule } from './database/database.module';
+import { ReservationDrizzleRepository } from './reservation/reservation.drizzle-repository';
 import { Argon2PasswordHasher } from './user/argon2-password-hasher';
 import { UserDrizzleRepository } from './user/user.drizzle-repository';
 
@@ -23,7 +25,16 @@ import { UserDrizzleRepository } from './user/user.drizzle-repository';
       provide: BARBER_REPOSITORY,
       useClass: BarberDrizzleRepository,
     },
+    {
+      provide: RESERVATION_REPOSITORY,
+      useClass: ReservationDrizzleRepository,
+    },
   ],
-  exports: [USER_REPOSITORY, PASSWORD_HASHER, BARBER_REPOSITORY],
+  exports: [
+    USER_REPOSITORY,
+    PASSWORD_HASHER,
+    BARBER_REPOSITORY,
+    RESERVATION_REPOSITORY,
+  ],
 })
 export class InfrastructureModule {}

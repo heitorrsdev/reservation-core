@@ -1,5 +1,3 @@
-import { ConflictError } from '@application/errors/conflict.error';
-import { UserAlreadyExistsError } from '@domain/user/errors/user-already-exists.error';
 import { User } from '@domain/user/user.entity';
 import { UserRepository } from '@domain/user/user.repository';
 import { Inject } from '@nestjs/common';
@@ -26,14 +24,7 @@ export class CreateUserUseCase {
       passwordHash,
     });
 
-    try {
-      await this.userRepository.save(user);
-    } catch (error) {
-      if (error instanceof ConflictError) {
-        throw new UserAlreadyExistsError(command.email);
-      }
-      throw error;
-    }
+    await this.userRepository.save(user);
 
     return { userId: user.id };
   }
