@@ -1,5 +1,8 @@
 version: '3'
 
+dotenv:
+  - .env.{{.ENV | default "test"}}
+
 vars:
   DEV_COMPOSE: docker/docker-compose.dev.yml
   PROD_COMPOSE: docker/docker-compose.prod.yml
@@ -13,15 +16,19 @@ tasks:
   # ─────────────────────────────────────────────
 
   check-env:
+    dotenv:
+      - .env.{{.ENV | default "test"}}
     cmds:
       - |
         if [ -z "$DATABASE_URL" ]; then
-          echo "❌ DATABASE_URL não definida"
+          echo "❌ DATABASE_URL não definida em .env.{{.ENV | default "test"}}"
           exit 1
         fi
 
   migrate:
     deps: [check-env]
+    dotenv:
+      - .env.{{.ENV | default "test"}}
     cmds:
       - pnpm migrate
 
@@ -30,6 +37,8 @@ tasks:
   # ─────────────────────────────────────────────
 
   compose:
+    dotenv:
+      - .env.{{.ENV | default "test"}}
     cmds:
       - docker compose -f {{.FILE}} {{.CMD}}
 
@@ -50,6 +59,10 @@ tasks:
   # ─────────────────────────────────────────────
 
   ci-test:
+    vars:
+      ENV: test
+    dotenv:
+      - .env.test
     cmds:
       - task test-reset
       - task test-up
@@ -63,26 +76,36 @@ tasks:
   # ─────────────────────────────────────────────
 
   dev-up:
+    vars:
+      ENV: dev
     cmds:
       - echo "🚧 Subindo Postgres DEV"
       - task compose FILE={{.DEV_COMPOSE}} CMD="up -d"
 
   dev-stop:
+    vars:
+      ENV: dev
     cmds:
       - echo "⏹️ Parando containers DEV"
       - task compose FILE={{.DEV_COMPOSE}} CMD="stop"
 
   dev-start:
+    vars:
+      ENV: dev
     cmds:
       - echo "▶️ Iniciando containers DEV"
       - task compose FILE={{.DEV_COMPOSE}} CMD="start"
 
   dev-down:
+    vars:
+      ENV: dev
     cmds:
       - echo "⬇️ Removendo containers DEV (mantendo volumes)"
       - task compose FILE={{.DEV_COMPOSE}} CMD="down"
 
   dev-reset:
+    vars:
+      ENV: dev
     cmds:
       - echo "💥 Resetando ambiente DEV (containers + volumes)"
       - task compose FILE={{.DEV_COMPOSE}} CMD="down -v"
@@ -93,6 +116,8 @@ tasks:
   # ─────────────────────────────────────────────
 
   prod-up:
+    vars:
+      ENV: prod
     cmds:
       - echo "🚀 Subindo Postgres PROD"
       - task compose FILE={{.PROD_COMPOSE}} CMD="up -d"
@@ -103,16 +128,22 @@ tasks:
   # ─────────────────────────────────────────────
 
   test-up:
+    vars:
+      ENV: test
     cmds:
       - echo "🧪 Subindo Postgres TEST"
       - task compose FILE={{.TEST_COMPOSE}} CMD="up -d --wait"
 
   test-down:
+    vars:
+      ENV: test
     cmds:
       - echo "⬇️ Removendo containers TEST (mantendo volumes)"
       - task compose FILE={{.TEST_COMPOSE}} CMD="down"
 
   test-reset:
+    vars:
+      ENV: test
     cmds:
       - echo "💥 Resetando ambiente TEST (containers + volumes)"
       - task compose FILE={{.TEST_COMPOSE}} CMD="down -v"

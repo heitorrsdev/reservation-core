@@ -270,20 +270,23 @@ but is never imported by domain or application directly.
 
 Never invert this dependency direction.
 
-## 13. Environment Variables
+## 13. Environment Configuration
 
-Environment variables are defined in `.env` (never committed).
+The project uses environment-specific `.env` files managed by `task`.
 
-| Variable | Purpose |
-|---|---|
-| `DATABASE_URL` | Active database connection used by migrations and the app |
-| `DEV_DATABASE_URL` | PostgreSQL on port 5432, used for local development |
-| `TEST_DATABASE_URL` | PostgreSQL on port 5433, isolated test database |
-| `PROD_DATABASE_URL` | Production database (never use locally) |
-| `DATABASE_PASSWORD` | Production database password |
+| File | Purpose | Versioned? |
+|---|---|---|
+| `.env.dev` | Local development variables | Yes |
+| `.env.test` | Test environment variables (Default) | Yes |
+| `.env.prod` | Production credentials/secrets | **No** |
 
-**When running tasks locally**, `DATABASE_URL` must point to the correct environment:
-- For dev: set `DATABASE_URL` to `DEV_DATABASE_URL`
-- For tests: `task ci-test` handles this automatically via the test compose and `secrets.TEST_DATABASE_URL` in CI
+**How it works:**
+- Tasks use `go-task` native `dotenv` support: `dotenv: [ .env.{{.ENV | default "test"}} ]`.
+- Running `task dev-*` automatically sets `ENV=dev` and loads `.env.dev`.
+- Running `task test-*` (or default tasks) loads `.env.test`.
+- Running `task prod-*` automatically sets `ENV=prod` and loads `.env.prod`.
 
-Never hardcode connection strings in source code. Never commit `.env`.
+**Primary Variables:**
+- `DATABASE_URL`: Active database connection used by migrations and the app.
+
+Never commit `.env.prod` or any other file containing real secrets. Use `.env.dev` and `.env.test` for non-sensitive, reproducible configurations.
