@@ -1,7 +1,9 @@
 import { Barber } from '@domain/barber/barber.entity';
 import { BarberRepository } from '@domain/barber/barber.repository';
+import { UserAlreadyBarberError } from '@domain/barber/errors/user-already-barber.error';
 import { DrizzleClient } from '@infrastructure/database/database.provider';
 import { DATABASE } from '@infrastructure/database/database.token';
+import { PostgresErrorMapper } from '@infrastructure/database/postgres-error.mapper';
 import { barbers } from '@infrastructure/database/schema/barber';
 import { Inject } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
@@ -16,7 +18,14 @@ export class BarberDrizzleRepository implements BarberRepository {
 
   async save(barber: Barber): Promise<void> {
     const data = BarberMapper.toPersistence(barber);
-    await this.db.insert(barbers).values(data);
+    try {
+      await this.db.insert(barbers).values(data);
+    } catch (error: unknown) {
+      if (PostgresErrorMapper.isUniqueViolation(error)) {
+        throw new UserAlreadyBarberError(barber.id);
+      }
+      throw error;
+    }
   }
 
   async findById(id: string): Promise<Barber | null> {
