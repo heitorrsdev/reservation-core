@@ -48,7 +48,7 @@ async function main() {
         [file],
       );
       await client.query('COMMIT');
-    } catch (e) {
+    } catch (e: unknown) {
       await client.query('ROLLBACK');
       throw e;
     }
@@ -57,7 +57,7 @@ async function main() {
   await client.end();
 }
 
-main().catch((err) => {
+main().catch((err: unknown) => {
   console.error('❌ Migration failed');
   console.error(err);
   process.exit(1);
