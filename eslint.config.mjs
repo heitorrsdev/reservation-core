@@ -44,7 +44,7 @@ export default tseslint.config(
         { type: 'domain', pattern: 'src/domain/**' },
         { type: 'application', pattern: 'src/application/**' },
         { type: 'infrastructure', pattern: 'src/infrastructure/**' },
-        { type: 'http', pattern: 'src/http/**' },
+        { type: 'http', pattern: 'src/interfaces/http/**' },
       ],
     },
 
