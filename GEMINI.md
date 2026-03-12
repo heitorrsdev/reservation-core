@@ -128,6 +128,14 @@ Allowed types: `feat`, `fix`, `refactor`, `test`, `docs`, `style`, `chore`
 
 Commit messages must be imperative, concise, and focused on a single change.
 
+`chore` applies to: tooling changes, configuration updates, dependency management, and developer experience (DX) improvements that do not affect application logic.
+
+Examples:
+- chore: add @src path alias
+- chore: harden eslint config
+- chore: update tsconfig paths
+
+
 **Branch naming:**
 
 ```
@@ -136,6 +144,7 @@ fix/bug-description
 refactor/refactor-description
 test/test-description
 docs/doc-description
+chore/short-description
 ```
 
 **PR rules:**
