@@ -156,6 +156,23 @@ Explanation of motivation and architectural reasoning.
 Why this approach was chosen and what it enables going forward.
 ```
 
+**Git workflow:**
+
+The agent must always follow these steps before starting any work:
+
+1. Switch to main: `git switch main`
+2. Fetch remote changes: `git fetch origin`
+3. Pull latest: `git pull origin main`
+4. Create and switch to the new branch from the updated main
+
+After completing any task:
+1. Stop and summarize what was done
+2. List all files modified
+3. Ask for explicit approval before proceeding to open a PR
+4. Only open the PR after receiving confirmation
+
+Never open a PR autonomously. Always wait for human review and approval first.
+
 ---
 
 ## 8. CI Pipeline
@@ -269,6 +286,8 @@ but is never imported by domain or application directly.
 ```
 
 Never invert this dependency direction.
+
+Never create a branch from a stale or non-main base unless explicitly instructed otherwise.
 
 ## 13. Environment Configuration
 
