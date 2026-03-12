@@ -1,7 +1,7 @@
 import { Reservation } from '@domain/reservation/reservation.entity';
-import { ReservationRepository } from '@domain/reservation/reservation.repository';
+import type { ReservationRepository } from '@domain/reservation/reservation.repository';
 
-import { CreateReservationCommand } from './create-reservation.command';
+import type { CreateReservationCommand } from './create-reservation.command';
 
 export class CreateReservationUseCase {
   constructor(private readonly reservationRepository: ReservationRepository) {}

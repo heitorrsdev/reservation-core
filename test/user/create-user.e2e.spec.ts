@@ -1,7 +1,11 @@
-import { INestApplication } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
+import type { ErrorResponseDto } from '@http/common/dto/error-response.dto';
+import type { CreateUserResponseDto } from '@http/user/dto/create-user-response.dto';
+import type { INestApplication } from '@nestjs/common';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
+import { bodyAs } from '@test/utils/http-response';
 import request from 'supertest';
-import { App } from 'supertest/types';
+import type { App } from 'supertest/types';
 
 import { configureApp } from '../../src/app.config';
 import { AppModule } from '../../src/app.module';
@@ -22,7 +26,7 @@ describe('UserController (e2e) - POST /users', () => {
 
     await app.init();
 
-    httpServer = app.getHttpServer();
+    httpServer = app.getHttpServer() as App;
   });
 
   beforeEach(async () => {
@@ -39,8 +43,10 @@ describe('UserController (e2e) - POST /users', () => {
       .send({ email: 'test@example.com', password: '123456' })
       .expect(201);
 
-    expect(response.body).toHaveProperty('userId');
-    expect(response.body.userId).toBeDefined();
+    const body = bodyAs<CreateUserResponseDto>(response);
+
+    expect(body).toHaveProperty('userId');
+    expect(body.userId).toBeDefined();
   });
 
   it('should return 409 when email already exists', async () => {
@@ -54,7 +60,9 @@ describe('UserController (e2e) - POST /users', () => {
       .send({ email: 'duplicate@example.com', password: '123456' })
       .expect(409);
 
-    expect(response.body.message).toContain('duplicate@example.com');
+    const body = bodyAs<ErrorResponseDto>(response);
+
+    expect(body.message).toContain('duplicate@example.com');
   });
 
   it('should return 400 when email is invalid', async () => {

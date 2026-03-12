@@ -1,5 +1,5 @@
 import { User } from '@domain/user/user.entity';
-import { users } from '@infrastructure/database/schema/user';
+import type { users } from '@infrastructure/database/schema/user';
 
 type UserSelect = typeof users.$inferSelect;
 type UserInsert = typeof users.$inferInsert;
