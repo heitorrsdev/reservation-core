@@ -25,6 +25,6 @@ export class BarberDrizzleRepository implements BarberRepository {
       .from(barbers)
       .where(eq(barbers.id, id));
 
-    return row ? BarberMapper.toDomain(row) : null;
+    return BarberMapper.toDomain(row);
   }
 }

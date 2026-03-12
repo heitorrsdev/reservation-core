@@ -1,4 +1,4 @@
-import { Database } from '@infrastructure/database/database.provider';
+import type { Database } from '@infrastructure/database/database.provider';
 import { reservations } from '@infrastructure/database/schema/reservation';
 import { TEST_TIME } from '@test/utils/time';
 import { randomUUID } from 'crypto';

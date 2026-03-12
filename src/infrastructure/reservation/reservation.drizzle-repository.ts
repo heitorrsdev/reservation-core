@@ -32,6 +32,6 @@ export class ReservationDrizzleRepository implements ReservationRepository {
       .from(reservations)
       .where(eq(reservations.id, id));
 
-    return row ? ReservationMapper.toDomain(row) : null;
+    return ReservationMapper.toDomain(row);
   }
 }

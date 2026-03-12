@@ -1,4 +1,4 @@
-import { Database } from '@infrastructure/database/database.provider';
+import type { Database } from '@infrastructure/database/database.provider';
 import { barbers } from '@infrastructure/database/schema/barber';
 import { randomUUID } from 'crypto';
 

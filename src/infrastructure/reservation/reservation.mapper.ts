@@ -1,5 +1,5 @@
 import { Reservation } from '@domain/reservation/reservation.entity';
-import { reservations } from '@infrastructure/database/schema';
+import type { reservations } from '@infrastructure/database/schema';
 
 type ReservationSelect = typeof reservations.$inferSelect;
 type ReservationInsert = typeof reservations.$inferInsert;

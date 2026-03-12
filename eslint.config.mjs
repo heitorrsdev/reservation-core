@@ -10,7 +10,7 @@ export default tseslint.config(
     ignores: ['eslint.config.mjs'],
   },
 
-  ...tseslint.configs.recommended,
+  ...tseslint.configs.recommendedTypeChecked,
 
   // Prettier
   eslintPluginPrettierRecommended,
@@ -19,6 +19,10 @@ export default tseslint.config(
     languageOptions: {
       globals: {
         ...globals.node,
+      },
+      parserOptions: {
+        project: true,
+        tsconfigRootDir: import.meta.dirname,
       },
     },
   },
@@ -48,15 +52,29 @@ export default tseslint.config(
       ],
     },
 
-    rules: {
-      // =====================
-      // TypeScript
-      // =====================
-      '@typescript-eslint/no-explicit-any': 'error',
+      rules: {
+        // =====================
+        // TypeScript
+        // =====================
+        '@typescript-eslint/no-explicit-any': 'error',
+        '@typescript-eslint/no-floating-promises': 'error',
+        '@typescript-eslint/await-thenable': 'error',
+        '@typescript-eslint/no-misused-promises': 'error',
+        '@typescript-eslint/consistent-type-imports': 'error',
+        '@typescript-eslint/no-unnecessary-type-assertion': 'error',
+        '@typescript-eslint/no-unnecessary-condition': 'warn',
 
-      // =====================
-      // Import sorting
-      // =====================
+        // =====================
+        // Unsafe any
+        // =====================
+        '@typescript-eslint/no-unsafe-assignment': 'error',
+        '@typescript-eslint/no-unsafe-member-access': 'error',
+        '@typescript-eslint/no-unsafe-call': 'error',
+        '@typescript-eslint/no-unsafe-return': 'error',
+
+        // =====================
+        // Import sorting
+        // =====================
       'simple-import-sort/imports': [
         'error',
         {

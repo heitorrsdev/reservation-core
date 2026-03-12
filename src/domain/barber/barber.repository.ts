@@ -1,4 +1,4 @@
-import { Barber } from './barber.entity';
+import type { Barber } from './barber.entity';
 
 export interface BarberRepository {
   save(barber: Barber): Promise<void>;

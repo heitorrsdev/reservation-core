@@ -1,4 +1,4 @@
-import { DomainError } from '@domain/errors/domain.error';
+import type { DomainError } from '@domain/errors/domain.error';
 import { UserAlreadyExistsError } from '@domain/user/errors/user-already-exists.error';
 import { HttpStatus } from '@nestjs/common';
 
