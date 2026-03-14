@@ -128,6 +128,10 @@ Allowed types: `feat`, `fix`, `refactor`, `test`, `docs`, `style`, `chore`
 
 Commit messages must be imperative, concise, and focused on a single change.
 
+Commits must be atomic: each commit should represent a single, self-contained change that leaves the codebase in a working state.
+Never batch unrelated changes in a single commit.
+Prefer multiple small commits over one large commit per task.
+
 `chore` applies to: tooling changes, configuration updates, dependency management, and developer experience (DX) improvements that do not affect application logic.
 
 Examples:
