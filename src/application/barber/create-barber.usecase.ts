@@ -5,6 +5,7 @@ import { UserNotFoundError } from '@domain/user/errors/user-not-found.error';
 import { UserRepository } from '@domain/user/user.repository';
 import { Inject } from '@nestjs/common';
 
+import { USER_REPOSITORY } from '../user/user-repository.token';
 import { BARBER_REPOSITORY } from './barber-repository.token';
 import { CreateBarberCommand } from './create-barber.command';
 
@@ -13,6 +14,7 @@ export class CreateBarberUseCase {
     @Inject(BARBER_REPOSITORY)
     private barberRepository: BarberRepository,
 
+    @Inject(USER_REPOSITORY)
     private userRepository: UserRepository,
   ) {}
 
