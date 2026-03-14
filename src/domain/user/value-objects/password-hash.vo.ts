@@ -4,7 +4,7 @@ export class PasswordHash {
   private constructor(readonly value: string) {}
 
   static create(hash: string) {
-    if (!hash || hash.length < 20) {
+    if (!hash || !hash.startsWith('$argon2')) {
       throw new InvalidUserPasswordHashError();
     }
     return new PasswordHash(hash);

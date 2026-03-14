@@ -29,11 +29,13 @@ export class BarberDrizzleRepository implements BarberRepository {
   }
 
   async findById(id: string): Promise<Barber | null> {
-    const [row] = await this.db
+    const result = await this.db
       .select()
       .from(barbers)
-      .where(eq(barbers.id, id));
+      .where(eq(barbers.id, id))
+      .limit(1);
 
-    return BarberMapper.toDomain(row);
+    if (!result.length) return null;
+    return BarberMapper.toDomain(result[0]);
   }
 }

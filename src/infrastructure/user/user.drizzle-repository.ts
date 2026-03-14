@@ -55,13 +55,8 @@ export class UserDrizzleRepository implements UserRepository {
       .where(eq(users.email, email))
       .limit(1);
 
-    if (result.length === 0) return null;
+    if (!result.length) return null;
 
-    return UserMapper.toDomain({
-      id: result[0].id,
-      email: result[0].email,
-      passwordHash: result[0].passwordHash,
-      createdAt: result[0].createdAt,
-    });
+    return UserMapper.toDomain(result[0]);
   }
 }

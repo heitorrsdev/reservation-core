@@ -7,7 +7,8 @@ type UserInsert = typeof users.$inferInsert;
 export function buildUser(input: Partial<UserInsert> = {}) {
   const id = input.id ?? randomUUID();
   const email = input.email ?? `user-${id}@example.com`;
-  const passwordHash = input.passwordHash ?? 'hashed-password';
+  const passwordHash =
+    input.passwordHash ?? '$argon2id$v=19$m=65536,t=3,p=4$fakehashfortesting';
   const createdAt = input.createdAt ?? new Date();
 
   return {
