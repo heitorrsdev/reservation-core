@@ -151,6 +151,11 @@ docs/doc-description
 chore/short-description
 ```
 
+Never append generated IDs, timestamps, hashes, or any automatic suffix to branch names.
+Branch names must always follow exactly: type/short-description
+Correct: refactor/domain-entity-created-at
+Wrong: refactor/domain-entity-created-at-12618706006155161774
+
 **PR rules:**
 
 PRs must be small and focused. Never mix refactors with features.
