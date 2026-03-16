@@ -11,11 +11,7 @@ export class User {
     readonly createdAt: Date,
   ) {}
 
-  static create(props: {
-    id?: string;
-    email: string;
-    passwordHash: string;
-  }) {
+  static create(props: { id?: string; email: string; passwordHash: string }) {
     return new User(
       props.id || randomUUID(),
       Email.create(props.email),
