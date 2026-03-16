@@ -179,10 +179,11 @@ The agent must always follow these steps before starting any work:
 4. Create and switch to the new branch from the updated main
 
 After completing any task:
-1. Stop and summarize what was done
-2. List all files modified
-3. Ask for explicit approval before proceeding to open a PR
-4. Only open the PR after receiving confirmation
+1. Run `task ci-test` and confirm all tests pass. If any test fails, fix it before proceeding.
+2. Stop and summarize what was done
+3. List all files modified
+4. Ask for explicit approval before proceeding to open a PR
+5. Only open the PR after receiving confirmation
 
 Never open a PR autonomously. Always wait for human review and approval first.
 
