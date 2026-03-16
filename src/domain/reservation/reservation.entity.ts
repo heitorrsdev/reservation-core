@@ -18,7 +18,6 @@ export class Reservation {
     barberId: string;
     startTime: Date;
     endTime: Date;
-    createdAt?: Date;
   }) {
     if (props.endTime <= props.startTime) {
       throw new InvalidReservationTimeError();
@@ -30,7 +29,25 @@ export class Reservation {
       props.barberId,
       props.startTime,
       props.endTime,
-      props.createdAt || new Date(),
+      new Date(),
+    );
+  }
+
+  static reconstitute(props: {
+    id: string;
+    userId: string;
+    barberId: string;
+    startTime: Date;
+    endTime: Date;
+    createdAt: Date;
+  }) {
+    return new Reservation(
+      props.id,
+      props.userId,
+      props.barberId,
+      props.startTime,
+      props.endTime,
+      props.createdAt,
     );
   }
 }

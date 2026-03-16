@@ -28,7 +28,6 @@ describe('Reservation invariants (integration)', () => {
       userId: user.id,
       startTime: new Date('2030-01-01T10:00:00Z'),
       endTime: new Date('2030-01-01T11:00:00Z'),
-      createdAt: new Date('2030-01-01T09:00:00Z'),
     });
 
     await repository.save(reservation);
@@ -54,7 +53,6 @@ describe('Reservation invariants (integration)', () => {
       userId: userA.id,
       startTime: start,
       endTime: end,
-      createdAt: new Date('2030-01-01T09:00:00Z'),
     });
 
     await repository.save(first);
@@ -65,7 +63,6 @@ describe('Reservation invariants (integration)', () => {
       userId: userB.id,
       startTime: start,
       endTime: end,
-      createdAt: new Date('2030-01-01T09:00:00Z'),
     });
 
     await expect(repository.save(conflicting)).rejects.toBeInstanceOf(

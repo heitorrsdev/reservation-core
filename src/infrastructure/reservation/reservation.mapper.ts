@@ -5,12 +5,13 @@ type ReservationSelect = typeof reservations.$inferSelect;
 type ReservationInsert = typeof reservations.$inferInsert;
 export class ReservationMapper {
   static toDomain(row: ReservationSelect): Reservation {
-    return Reservation.create({
+    return Reservation.reconstitute({
       id: row.id,
       userId: row.userId,
       barberId: row.barberId,
       startTime: row.startTime,
       endTime: row.endTime,
+      createdAt: row.createdAt,
     });
   }
 

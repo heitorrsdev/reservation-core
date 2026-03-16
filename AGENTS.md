@@ -151,6 +151,11 @@ docs/doc-description
 chore/short-description
 ```
 
+Never append generated IDs, timestamps, hashes, or any automatic suffix to branch names.
+Branch names must always follow exactly: type/short-description
+Correct: refactor/domain-entity-created-at
+Wrong: refactor/domain-entity-created-at-12618706006155161774
+
 **PR rules:**
 
 PRs must be small and focused. Never mix refactors with features.
@@ -179,10 +184,11 @@ The agent must always follow these steps before starting any work:
 4. Create and switch to the new branch from the updated main
 
 After completing any task:
-1. Stop and summarize what was done
-2. List all files modified
-3. Ask for explicit approval before proceeding to open a PR
-4. Only open the PR after receiving confirmation
+1. Run `task ci-test` and confirm all tests pass. If any test fails, fix it before proceeding.
+2. Stop and summarize what was done
+3. List all files modified
+4. Ask for explicit approval before proceeding to open a PR
+5. Only open the PR after receiving confirmation
 
 Never open a PR autonomously. Always wait for human review and approval first.
 
@@ -202,6 +208,8 @@ Pipeline steps (via GitHub Actions):
 `DATABASE_URL` is injected from `secrets.TEST_DATABASE_URL`.
 
 A PR must pass all CI steps before merging. Never open a PR that is known to break lint, typecheck, or tests.
+
+When running in a containerless environment (such as Jules), `task ci-test` will fail due to Docker Hub pull rate limits or lack of container access. In this case, run `task typecheck` and `pnpm build` as a fallback. The human reviewer is responsible for running `task ci-test` locally before approving the PR.
 
 ---
 
@@ -270,6 +278,12 @@ ADRs are located in `docs/adr/` and document all major technical decisions:
 ---
 
 ## 12. Hard Rules
+
+Entities must have two separate static factory methods:
+- `create()` — for new entity creation. Never accepts `createdAt` as input. Always sets `createdAt: new Date()` internally.
+- `reconstitute()` — exclusively for infrastructure mappers rebuilding entities from database rows. Accepts all fields including `createdAt` and `active` state.
+
+Never call `create()` from mappers. Never call `reconstitute()` from use cases or application layer.
 
 Never place framework code inside the domain layer. Domain must never depend on NestJS, Drizzle, PostgreSQL, HTTP, or DTOs.
 

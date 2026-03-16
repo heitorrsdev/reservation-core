@@ -15,13 +15,26 @@ export class User {
     id?: string;
     email: string;
     passwordHash: string;
-    createdAt?: Date;
   }) {
     return new User(
       props.id || randomUUID(),
       Email.create(props.email),
       PasswordHash.create(props.passwordHash),
-      props.createdAt || new Date(),
+      new Date(),
+    );
+  }
+
+  static reconstitute(props: {
+    id: string;
+    email: string;
+    passwordHash: string;
+    createdAt: Date;
+  }) {
+    return new User(
+      props.id,
+      Email.create(props.email),
+      PasswordHash.create(props.passwordHash),
+      props.createdAt,
     );
   }
 }
