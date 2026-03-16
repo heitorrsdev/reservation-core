@@ -11,14 +11,29 @@ export class Barber {
     userId: string;
     name: string;
     bio?: string | null;
-    createdAt?: Date;
   }) {
     return new Barber(
       props.userId,
       props.name,
       props.bio ?? null,
       true,
-      props.createdAt || new Date(),
+      new Date(),
+    );
+  }
+
+  static reconstitute(props: {
+    id: string;
+    name: string;
+    bio: string | null;
+    active: boolean;
+    createdAt: Date;
+  }) {
+    return new Barber(
+      props.id,
+      props.name,
+      props.bio,
+      props.active,
+      props.createdAt,
     );
   }
 
