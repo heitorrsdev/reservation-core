@@ -7,11 +7,7 @@ export class Barber {
     readonly createdAt: Date,
   ) {}
 
-  static create(props: {
-    userId: string;
-    name: string;
-    bio?: string | null;
-  }) {
+  static create(props: { userId: string; name: string; bio?: string | null }) {
     return new Barber(
       props.userId,
       props.name,
