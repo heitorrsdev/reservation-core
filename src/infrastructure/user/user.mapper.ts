@@ -6,7 +6,7 @@ type UserInsert = typeof users.$inferInsert;
 
 export class UserMapper {
   static toDomain(row: UserSelect): User {
-    return User.create({
+    return User.reconstitute({
       id: row.id,
       email: row.email,
       passwordHash: row.passwordHash,

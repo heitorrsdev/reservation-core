@@ -204,6 +204,8 @@ Pipeline steps (via GitHub Actions):
 
 A PR must pass all CI steps before merging. Never open a PR that is known to break lint, typecheck, or tests.
 
+When running in a containerless environment (such as Jules), `task ci-test` will fail due to Docker Hub pull rate limits or lack of container access. In this case, run `task typecheck` and `pnpm build` as a fallback. The human reviewer is responsible for running `task ci-test` locally before approving the PR.
+
 ---
 
 ## 9. Testing
@@ -271,6 +273,12 @@ ADRs are located in `docs/adr/` and document all major technical decisions:
 ---
 
 ## 12. Hard Rules
+
+Entities must have two separate static factory methods:
+- `create()` — for new entity creation. Never accepts `createdAt` as input. Always sets `createdAt: new Date()` internally.
+- `reconstitute()` — exclusively for infrastructure mappers rebuilding entities from database rows. Accepts all fields including `createdAt` and `active` state.
+
+Never call `create()` from mappers. Never call `reconstitute()` from use cases or application layer.
 
 Never place framework code inside the domain layer. Domain must never depend on NestJS, Drizzle, PostgreSQL, HTTP, or DTOs.
 
