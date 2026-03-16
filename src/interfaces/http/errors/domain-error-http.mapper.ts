@@ -8,7 +8,7 @@ import { UserAlreadyExistsError } from '@domain/user/errors/user-already-exists.
 import { UserNotFoundError } from '@domain/user/errors/user-not-found.error';
 import { HttpStatus } from '@nestjs/common';
 
-const errorStatusMap: Record<string, HttpStatus> = {
+export const errorStatusMap: Record<string, HttpStatus> = {
   [UserAlreadyExistsError.name]: HttpStatus.CONFLICT,
   [UserAlreadyBarberError.name]: HttpStatus.CONFLICT,
   [UserNotFoundError.name]: HttpStatus.NOT_FOUND,
