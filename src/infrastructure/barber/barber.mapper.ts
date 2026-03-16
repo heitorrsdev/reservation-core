@@ -5,10 +5,11 @@ type BarberSelect = typeof barbers.$inferSelect;
 type BarberInsert = typeof barbers.$inferInsert;
 export class BarberMapper {
   static toDomain(row: BarberSelect): Barber {
-    return Barber.create({
-      userId: row.id,
+    return Barber.reconstitute({
+      id: row.id,
       name: row.name,
       bio: row.bio,
+      active: row.active,
       createdAt: row.createdAt,
     });
   }
