@@ -36,6 +36,7 @@ export class BarberDrizzleRepository implements BarberRepository {
       .limit(1);
 
     if (!result.length) return null;
+
     return BarberMapper.toDomain(result[0]);
   }
 }

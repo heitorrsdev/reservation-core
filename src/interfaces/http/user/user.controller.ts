@@ -16,6 +16,6 @@ export class UserController {
       password: dto.password,
     });
 
-    return { userId: result.userId };
+    return result;
   }
 }

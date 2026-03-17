@@ -1,5 +1,7 @@
 export class PostgresErrorMapper {
-  static isPostgresError(error: unknown): error is { code: string } {
+  static isPostgresError(
+    error: unknown,
+  ): error is { code: string; detail?: string } {
     return (
       typeof error === 'object' &&
       error !== null &&
@@ -11,22 +13,49 @@ export class PostgresErrorMapper {
   static extractCode(error: unknown): string | null {
     if (!error || typeof error !== 'object') return null;
 
-    // Direct pg error
     if (this.isPostgresError(error)) {
       return error.code;
     }
 
     // Drizzle wraps pg errors inside `cause`
     if ('cause' in error && error.cause && typeof error.cause === 'object') {
-      if (
-        'code' in error.cause &&
-        typeof (error.cause as { code: unknown }).code === 'string'
-      ) {
-        return (error.cause as { code: string }).code;
+      const cause = error.cause as { code?: unknown };
+      if (typeof cause.code === 'string') {
+        return cause.code;
       }
     }
 
     return null;
+  }
+
+  static extractDetail(error: unknown): string | null {
+    if (this.isPostgresError(error) && error.detail) {
+      return error.detail;
+    }
+
+    if (typeof error === 'object' && error !== null && 'cause' in error) {
+      const cause = error.cause as { detail?: unknown };
+      if (typeof cause.detail === 'string') {
+        return cause.detail;
+      }
+    }
+
+    return null;
+  }
+
+  static getForeignKeyDetails(
+    error: unknown,
+  ): { column: string; value: string } | null {
+    const detail = this.extractDetail(error);
+    if (!detail) return null;
+
+    const match = detail.match(/Key \((.+)\)=\((.+)\) is not present/);
+    if (!match) return null;
+
+    return {
+      column: match[1],
+      value: match[2],
+    };
   }
 
   static isNotNullViolation(error: unknown): boolean {

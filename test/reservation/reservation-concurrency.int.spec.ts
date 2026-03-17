@@ -47,6 +47,9 @@ it('should prevent double booking under real concurrency', async () => {
   expect(failed.length).toBe(users.length - 1);
 
   for (const f of failed) {
+    if (!(f.reason instanceof ReservationConflictError)) {
+      console.error('UNEXPECTED ERROR:', f.reason);
+    }
     expect(f.reason).toBeInstanceOf(ReservationConflictError);
   }
 });
