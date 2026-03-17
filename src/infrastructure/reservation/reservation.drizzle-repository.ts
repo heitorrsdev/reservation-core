@@ -1,6 +1,9 @@
+import { BarberNotFoundError } from '@domain/barber/errors/barber-not-found.error';
+import { DependencyNotFoundError } from '@domain/errors/dependency-not-found.error';
 import { ReservationConflictError } from '@domain/reservation/errors/reservation-conflict.error';
 import { Reservation } from '@domain/reservation/reservation.entity';
 import { ReservationRepository } from '@domain/reservation/reservation.repository';
+import { UserNotFoundError } from '@domain/user/errors/user-not-found.error';
 import { DrizzleClient } from '@infrastructure/database/database.provider';
 import { DATABASE } from '@infrastructure/database/database.token';
 import { PostgresErrorMapper } from '@infrastructure/database/postgres-error.mapper';
@@ -22,16 +25,32 @@ export class ReservationDrizzleRepository implements ReservationRepository {
         throw new ReservationConflictError();
       }
 
+      if (PostgresErrorMapper.isForeignKeyViolation(error)) {
+        const details = PostgresErrorMapper.getForeignKeyDetails(error);
+
+        if (details?.column === 'user_id') {
+          throw new UserNotFoundError(details.value);
+        }
+
+        if (details?.column === 'barber_id') {
+          throw new BarberNotFoundError(details.value);
+        }
+
+        throw new DependencyNotFoundError('Reservation', details?.value);
+      }
+
       throw error;
     }
   }
 
   async findById(id: string): Promise<Reservation | null> {
-    const [row] = await this.db
+    const result = await this.db
       .select()
       .from(reservations)
       .where(eq(reservations.id, id));
 
-    return ReservationMapper.toDomain(row);
+    if (!result.length) return null;
+
+    return ReservationMapper.toDomain(result[0]);
   }
 }
