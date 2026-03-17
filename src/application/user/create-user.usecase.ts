@@ -3,7 +3,7 @@ import { UserRepository } from '@domain/user/user.repository';
 import { Inject } from '@nestjs/common';
 
 import { CreateUserCommand } from './create-user.command';
-import { PasswordHasher } from './password-hasher';
+import { PasswordHasher } from './password-hasher.interface';
 import { PASSWORD_HASHER } from './password-hasher.token';
 import { USER_REPOSITORY } from './user-repository.token';
 
