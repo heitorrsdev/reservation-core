@@ -1,9 +1,14 @@
+import { TOKEN_GENERATOR } from '@application/auth/token-generator.token';
 import { BARBER_REPOSITORY } from '@application/barber/barber-repository.token';
 import { RESERVATION_REPOSITORY } from '@application/reservation/reservation-repository.token';
 import { PASSWORD_HASHER } from '@application/user/password-hasher.token';
 import { USER_REPOSITORY } from '@application/user/user-repository.token';
 import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 
+import { JwtStrategy } from './auth/jwt.strategy';
+import { JwtTokenGenerator } from './auth/jwt-token.generator';
 import { BarberDrizzleRepository } from './barber/barber.drizzle-repository';
 import { DatabaseModule } from './database/database.module';
 import { ReservationDrizzleRepository } from './reservation/reservation.drizzle-repository';
@@ -11,7 +16,16 @@ import { Argon2PasswordHasher } from './user/argon2-password-hasher';
 import { UserDrizzleRepository } from './user/user.drizzle-repository';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [
+    DatabaseModule,
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        secret: config.get<string>('JWT_SECRET') ?? '',
+        signOptions: { expiresIn: '24h' },
+      }),
+    }),
+  ],
   providers: [
     {
       provide: USER_REPOSITORY,
@@ -29,12 +43,18 @@ import { UserDrizzleRepository } from './user/user.drizzle-repository';
       provide: RESERVATION_REPOSITORY,
       useClass: ReservationDrizzleRepository,
     },
+    {
+      provide: TOKEN_GENERATOR,
+      useClass: JwtTokenGenerator,
+    },
+    JwtStrategy,
   ],
   exports: [
     USER_REPOSITORY,
     PASSWORD_HASHER,
     BARBER_REPOSITORY,
     RESERVATION_REPOSITORY,
+    TOKEN_GENERATOR,
   ],
 })
 export class InfrastructureModule {}

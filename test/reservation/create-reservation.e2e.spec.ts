@@ -1,3 +1,5 @@
+import type { TokenGenerator } from '@application/auth/token-generator.interface';
+import { TOKEN_GENERATOR } from '@application/auth/token-generator.token';
 import type { CreatedResponseDto } from '@http/common/dto/created-response.dto';
 import type { ErrorResponseDto } from '@http/common/dto/error-response.dto';
 import type { INestApplication } from '@nestjs/common';
@@ -17,6 +19,7 @@ import { truncateTestDatabase } from '../utils/infra/truncate-test-db';
 describe('ReservationController (e2e) - POST /reservations', () => {
   let app: INestApplication;
   let httpServer: App;
+  let tokenGenerator: TokenGenerator;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -30,6 +33,7 @@ describe('ReservationController (e2e) - POST /reservations', () => {
     await app.init();
 
     httpServer = app.getHttpServer() as App;
+    tokenGenerator = app.get<TokenGenerator>(TOKEN_GENERATOR);
   });
 
   beforeEach(async () => {
@@ -39,6 +43,13 @@ describe('ReservationController (e2e) - POST /reservations', () => {
   afterAll(async () => {
     await app.close();
   });
+
+  async function getTokenForUser(
+    userId: string,
+    email: string,
+  ): Promise<string> {
+    return tokenGenerator.generate({ sub: userId, email });
+  }
 
   it('should create a reservation and return 201', async () => {
     const user = await persistUser(testDb);
@@ -50,10 +61,15 @@ describe('ReservationController (e2e) - POST /reservations', () => {
     const endTime = new Date(startTime);
     endTime.setHours(11, 0, 0, 0);
 
+    const token = await getTokenForUser(
+      user.id as unknown as string,
+      user.email as unknown as string,
+    );
+
     const response = await request(httpServer)
       .post('/reservations')
+      .set('Authorization', `Bearer ${token}`)
       .send({
-        userId: user.id,
         barberId: barber.id,
         startTime: startTime.toISOString(),
         endTime: endTime.toISOString(),
@@ -76,10 +92,19 @@ describe('ReservationController (e2e) - POST /reservations', () => {
     const endTime = new Date(startTime);
     endTime.setHours(11, 0, 0, 0);
 
+    const token1 = await getTokenForUser(
+      user1.id as unknown as string,
+      user1.email as unknown as string,
+    );
+    const token2 = await getTokenForUser(
+      user2.id as unknown as string,
+      user2.email as unknown as string,
+    );
+
     await request(httpServer)
       .post('/reservations')
+      .set('Authorization', `Bearer ${token1}`)
       .send({
-        userId: user1.id,
         barberId: barber.id,
         startTime: startTime.toISOString(),
         endTime: endTime.toISOString(),
@@ -88,8 +113,8 @@ describe('ReservationController (e2e) - POST /reservations', () => {
 
     const response = await request(httpServer)
       .post('/reservations')
+      .set('Authorization', `Bearer ${token2}`)
       .send({
-        userId: user2.id,
         barberId: barber.id,
         startTime: startTime.toISOString(),
         endTime: endTime.toISOString(),
@@ -110,39 +135,20 @@ describe('ReservationController (e2e) - POST /reservations', () => {
     const endTime = new Date(startTime);
     endTime.setHours(10, 0, 0, 0);
 
+    const token = await getTokenForUser(
+      user.id as unknown as string,
+      user.email as unknown as string,
+    );
+
     await request(httpServer)
       .post('/reservations')
+      .set('Authorization', `Bearer ${token}`)
       .send({
-        userId: user.id,
         barberId: barber.id,
         startTime: startTime.toISOString(),
         endTime: endTime.toISOString(),
       })
       .expect(422);
-  });
-
-  it('should return 404 when userId does not exist', async () => {
-    const barberUser = await persistUser(testDb);
-    const barber = await persistBarber(testDb, { id: barberUser.id });
-    const nonExistentId = '00000000-0000-4000-a000-000000000000';
-
-    const startTime = new Date();
-    startTime.setHours(10, 0, 0, 0);
-    const endTime = new Date(startTime);
-    endTime.setHours(11, 0, 0, 0);
-
-    const response = await request(httpServer)
-      .post('/reservations')
-      .send({
-        userId: nonExistentId,
-        barberId: barber.id,
-        startTime: startTime.toISOString(),
-        endTime: endTime.toISOString(),
-      })
-      .expect(404);
-
-    const body = bodyAs<ErrorResponseDto>(response);
-    expect(body.message).toContain(nonExistentId);
   });
 
   it('should return 404 when barberId does not exist', async () => {
@@ -154,10 +160,15 @@ describe('ReservationController (e2e) - POST /reservations', () => {
     const endTime = new Date(startTime);
     endTime.setHours(11, 0, 0, 0);
 
+    const token = await getTokenForUser(
+      user.id as unknown as string,
+      user.email as unknown as string,
+    );
+
     const response = await request(httpServer)
       .post('/reservations')
+      .set('Authorization', `Bearer ${token}`)
       .send({
-        userId: user.id,
         barberId: nonExistentId,
         startTime: startTime.toISOString(),
         endTime: endTime.toISOString(),
@@ -169,10 +180,25 @@ describe('ReservationController (e2e) - POST /reservations', () => {
   });
 
   it('should return 400 when required fields are missing', async () => {
-    await request(httpServer).post('/reservations').send({}).expect(400);
+    const user = await persistUser(testDb);
+    const token = await getTokenForUser(
+      user.id as unknown as string,
+      user.email as unknown as string,
+    );
+    await request(httpServer)
+      .post('/reservations')
+      .set('Authorization', `Bearer ${token}`)
+      .send({})
+      .expect(400);
   });
 
-  it('should return 400 when userId or barberId is not a valid UUID', async () => {
+  it('should return 400 when barberId is not a valid UUID', async () => {
+    const user = await persistUser(testDb);
+    const token = await getTokenForUser(
+      user.id as unknown as string,
+      user.email as unknown as string,
+    );
+
     const startTime = new Date();
     startTime.setHours(10, 0, 0, 0);
     const endTime = new Date(startTime);
@@ -180,8 +206,8 @@ describe('ReservationController (e2e) - POST /reservations', () => {
 
     await request(httpServer)
       .post('/reservations')
+      .set('Authorization', `Bearer ${token}`)
       .send({
-        userId: 'invalid-id',
         barberId: 'also-invalid',
         startTime: startTime.toISOString(),
         endTime: endTime.toISOString(),
@@ -194,10 +220,15 @@ describe('ReservationController (e2e) - POST /reservations', () => {
     const barberUser = await persistUser(testDb);
     const barber = await persistBarber(testDb, { id: barberUser.id });
 
+    const token = await getTokenForUser(
+      user.id as unknown as string,
+      user.email as unknown as string,
+    );
+
     await request(httpServer)
       .post('/reservations')
+      .set('Authorization', `Bearer ${token}`)
       .send({
-        userId: user.id,
         barberId: barber.id,
         startTime: 'not-a-date',
         endTime: 'not-a-date-either',
