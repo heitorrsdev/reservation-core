@@ -38,6 +38,7 @@ The decisions described here **reflect the actual state of the code at the time 
 | 0009 | Postgres Error Mapper                |
 | 0010 | UUID as Identifier Type              |
 | 0011 | Application-Controlled Timestamps    |
+| 0012 | Entity Factory Method Separation     |
 
 
 
