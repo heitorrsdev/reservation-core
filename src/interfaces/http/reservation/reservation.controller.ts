@@ -1,4 +1,3 @@
-import { CreateReservationCommand } from '@application/reservation/create-reservation.command';
 import { CreateReservationUseCase } from '@application/reservation/create-reservation.usecase';
 import { Body, Controller, Post } from '@nestjs/common';
 
@@ -15,15 +14,11 @@ export class ReservationController {
   async create(
     @Body() body: CreateReservationDto,
   ): Promise<CreatedResponseDto> {
-    const command: CreateReservationCommand = {
+    return await this.createReservationUseCase.execute({
       userId: body.userId,
       barberId: body.barberId,
       startTime: new Date(body.startTime),
       endTime: new Date(body.endTime),
-    };
-
-    const result = await this.createReservationUseCase.execute(command);
-
-    return result;
+    });
   }
 }

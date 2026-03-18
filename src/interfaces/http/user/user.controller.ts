@@ -11,11 +11,9 @@ export class UserController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() dto: CreateUserDto): Promise<CreatedResponseDto> {
-    const result = await this.createUserUseCase.execute({
+    return await this.createUserUseCase.execute({
       email: dto.email,
       password: dto.password,
     });
-
-    return result;
   }
 }
