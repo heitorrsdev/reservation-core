@@ -1,5 +1,5 @@
+import type { CreatedResponseDto } from '@http/common/dto/created-response.dto';
 import type { ErrorResponseDto } from '@http/common/dto/error-response.dto';
-import type { CreateReservationResponseDto } from '@http/reservation/dto/create-reservation-response.dto';
 import type { INestApplication } from '@nestjs/common';
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
@@ -60,9 +60,9 @@ describe('ReservationController (e2e) - POST /reservations', () => {
       })
       .expect(201);
 
-    const body = bodyAs<CreateReservationResponseDto>(response);
-    expect(body).toHaveProperty('reservationId');
-    expect(typeof body.reservationId).toBe('string');
+    const body = bodyAs<CreatedResponseDto>(response);
+    expect(body).toHaveProperty('id');
+    expect(typeof body.id).toBe('string');
   });
 
   it('should return 409 when barber already has an overlapping reservation', async () => {

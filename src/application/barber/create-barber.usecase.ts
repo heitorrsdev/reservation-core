@@ -18,7 +18,7 @@ export class CreateBarberUseCase {
     private userRepository: UserRepository,
   ) {}
 
-  async execute(command: CreateBarberCommand): Promise<void> {
+  async execute(command: CreateBarberCommand): Promise<{ id: string }> {
     const userExists = await this.userRepository.findById(command.userId);
     if (!userExists) {
       throw new UserNotFoundError(command.userId);
@@ -36,5 +36,7 @@ export class CreateBarberUseCase {
     });
 
     await this.barberRepository.save(barber);
+
+    return { id: barber.id };
   }
 }

@@ -2,8 +2,8 @@ import { CreateReservationCommand } from '@application/reservation/create-reserv
 import { CreateReservationUseCase } from '@application/reservation/create-reservation.usecase';
 import { Body, Controller, Post } from '@nestjs/common';
 
+import { CreatedResponseDto } from '../common/dto/created-response.dto';
 import { CreateReservationDto } from './dto/create-reservation.dto';
-import { CreateReservationResponseDto } from './dto/create-reservation-response.dto';
 
 @Controller('reservations')
 export class ReservationController {
@@ -14,7 +14,7 @@ export class ReservationController {
   @Post()
   async create(
     @Body() body: CreateReservationDto,
-  ): Promise<CreateReservationResponseDto> {
+  ): Promise<CreatedResponseDto> {
     const command: CreateReservationCommand = {
       userId: body.userId,
       barberId: body.barberId,

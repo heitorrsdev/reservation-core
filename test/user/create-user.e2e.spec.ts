@@ -1,5 +1,5 @@
+import type { CreatedResponseDto } from '@http/common/dto/created-response.dto';
 import type { ErrorResponseDto } from '@http/common/dto/error-response.dto';
-import type { CreateUserResponseDto } from '@http/user/dto/create-user-response.dto';
 import type { INestApplication } from '@nestjs/common';
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
@@ -43,10 +43,9 @@ describe('UserController (e2e) - POST /users', () => {
       .send({ email: 'test@example.com', password: '123456' })
       .expect(201);
 
-    const body = bodyAs<CreateUserResponseDto>(response);
-
-    expect(body).toHaveProperty('userId');
-    expect(body.userId).toBeDefined();
+    const body = bodyAs<CreatedResponseDto>(response);
+    expect(body).toHaveProperty('id');
+    expect(typeof body.id).toBe('string');
   });
 
   it('should return 409 when email already exists', async () => {

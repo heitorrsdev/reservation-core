@@ -16,7 +16,7 @@ export class CreateUserUseCase {
     private readonly passwordHasher: PasswordHasher,
   ) {}
 
-  async execute(command: CreateUserCommand): Promise<{ userId: string }> {
+  async execute(command: CreateUserCommand): Promise<{ id: string }> {
     const passwordHash = await this.passwordHasher.hash(command.password);
 
     const user = User.create({
@@ -26,6 +26,6 @@ export class CreateUserUseCase {
 
     await this.userRepository.save(user);
 
-    return { userId: user.id };
+    return { id: user.id };
   }
 }

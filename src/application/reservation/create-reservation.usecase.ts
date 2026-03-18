@@ -11,9 +11,7 @@ export class CreateReservationUseCase {
     private readonly reservationRepository: ReservationRepository,
   ) {}
 
-  async execute(
-    command: CreateReservationCommand,
-  ): Promise<{ reservationId: string }> {
+  async execute(command: CreateReservationCommand): Promise<{ id: string }> {
     const reservation = Reservation.create({
       userId: command.userId,
       barberId: command.barberId,
@@ -23,6 +21,6 @@ export class CreateReservationUseCase {
 
     await this.reservationRepository.save(reservation);
 
-    return { reservationId: reservation.id };
+    return { id: reservation.id };
   }
 }
