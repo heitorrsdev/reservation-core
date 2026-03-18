@@ -50,7 +50,15 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       });
     }
 
-    this.logger.error(exception);
+    if (exception instanceof Error) {
+      this.logger.error(exception.message, exception.stack);
+    } else {
+      try {
+        this.logger.error('Unhandled exception', JSON.stringify(exception));
+      } catch {
+        this.logger.error('Unhandled exception', String(exception));
+      }
+    }
 
     return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       statusCode: 500,
