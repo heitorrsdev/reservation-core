@@ -1,7 +1,9 @@
 import { ApplicationModule } from '@application/application.module';
+import { JwtAuthGuard } from '@infrastructure/auth/jwt-auth.guard';
 import { Module } from '@nestjs/common';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 
+import { AuthController } from './auth/auth.controller';
 import { BarberController } from './barber/barber.controller';
 import { GlobalExceptionFilter } from './filters/global-exception.filter';
 import { ReservationController } from './reservation/reservation.controller';
@@ -9,11 +11,20 @@ import { UserController } from './user/user.controller';
 
 @Module({
   imports: [ApplicationModule],
-  controllers: [UserController, BarberController, ReservationController],
+  controllers: [
+    AuthController,
+    UserController,
+    BarberController,
+    ReservationController,
+  ],
   providers: [
     {
       provide: APP_FILTER,
       useClass: GlobalExceptionFilter,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
     },
   ],
 })
