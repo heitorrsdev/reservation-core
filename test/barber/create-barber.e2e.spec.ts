@@ -1,3 +1,4 @@
+import type { CreatedResponseDto } from '@http/common/dto/created-response.dto';
 import type { ErrorResponseDto } from '@http/common/dto/error-response.dto';
 import type { INestApplication } from '@nestjs/common';
 import type { TestingModule } from '@nestjs/testing';
@@ -42,7 +43,7 @@ describe('BarberController (e2e) - POST /barbers', () => {
   it('should create a barber and return 201', async () => {
     const user = await persistUser(testDb);
 
-    await request(httpServer)
+    const response = await request(httpServer)
       .post('/barbers')
       .send({
         userId: user.id,
@@ -50,18 +51,26 @@ describe('BarberController (e2e) - POST /barbers', () => {
         bio: 'Expert in fades',
       })
       .expect(201);
+
+    const body = bodyAs<CreatedResponseDto>(response);
+    expect(body).toHaveProperty('id');
+    expect(body.id).toBe(user.id);
   });
 
   it('should create a barber with bio omitted', async () => {
     const user = await persistUser(testDb);
 
-    await request(httpServer)
+    const response = await request(httpServer)
       .post('/barbers')
       .send({
         userId: user.id,
         name: 'John the Barber',
       })
       .expect(201);
+
+    const body = bodyAs<CreatedResponseDto>(response);
+    expect(body).toHaveProperty('id');
+    expect(body.id).toBe(user.id);
   });
 
   it('should return 409 when user is already a barber', async () => {
