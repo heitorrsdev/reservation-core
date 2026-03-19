@@ -1,7 +1,9 @@
 import type { INestApplication } from '@nestjs/common';
 import { ValidationPipe } from '@nestjs/common';
+import cookieParser from 'cookie-parser';
 
 export function configureApp(app: INestApplication) {
+  app.use(cookieParser());
   app.enableCors({
     origin:
       process.env.ALLOWED_ORIGINS?.split(',').map((o) => o.trim()) || false,
