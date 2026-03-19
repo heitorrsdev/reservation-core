@@ -1,3 +1,4 @@
+import { REFRESH_TOKEN_REPOSITORY } from '@application/auth/refresh-token-repository.token';
 import { TOKEN_GENERATOR } from '@application/auth/token-generator.token';
 import { BARBER_REPOSITORY } from '@application/barber/barber-repository.token';
 import { RESERVATION_REPOSITORY } from '@application/reservation/reservation-repository.token';
@@ -9,6 +10,7 @@ import { JwtModule } from '@nestjs/jwt';
 
 import { JwtStrategy } from './auth/jwt.strategy';
 import { JwtTokenGenerator } from './auth/jwt-token.generator';
+import { RefreshTokenDrizzleRepository } from './auth/refresh-token.drizzle-repository';
 import { BarberDrizzleRepository } from './barber/barber.drizzle-repository';
 import { DatabaseModule } from './database/database.module';
 import { ReservationDrizzleRepository } from './reservation/reservation.drizzle-repository';
@@ -47,6 +49,10 @@ import { UserDrizzleRepository } from './user/user.drizzle-repository';
       provide: TOKEN_GENERATOR,
       useClass: JwtTokenGenerator,
     },
+    {
+      provide: REFRESH_TOKEN_REPOSITORY,
+      useClass: RefreshTokenDrizzleRepository,
+    },
     JwtStrategy,
   ],
   exports: [
@@ -55,6 +61,7 @@ import { UserDrizzleRepository } from './user/user.drizzle-repository';
     BARBER_REPOSITORY,
     RESERVATION_REPOSITORY,
     TOKEN_GENERATOR,
+    REFRESH_TOKEN_REPOSITORY,
   ],
 })
 export class InfrastructureModule {}
