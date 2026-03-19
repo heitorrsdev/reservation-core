@@ -4,6 +4,7 @@ import type { INestApplication } from '@nestjs/common';
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
 import { persistUser } from '@test/factories/user.factory';
+import { bodyAs } from '@test/utils/http-response';
 import { testDb } from '@test/utils/infra/test-database';
 import request from 'supertest';
 import type { App } from 'supertest/types';
@@ -50,9 +51,42 @@ describe('AuthController (e2e) - POST /auth/login', () => {
       .send({ email: user.email, password })
       .expect(200);
 
-    const body = response.body as { accessToken: string };
+    const body = bodyAs<{ accessToken: string }>(response);
     expect(body).toHaveProperty('accessToken');
     expect(typeof body.accessToken).toBe('string');
+  });
+
+  it('should set a refreshToken HttpOnly cookie on successful login', async () => {
+    const password = 'securepassword123';
+    const passwordHash = await passwordHasher.hash(password);
+    const user = await persistUser(testDb, { passwordHash });
+
+    const response = await request(httpServer)
+      .post('/auth/login')
+      .send({ email: user.email, password })
+      .expect(200);
+
+    const cookies = response.headers['set-cookie'] as unknown as string[];
+    expect(cookies).toBeDefined();
+    const refreshCookie = cookies.find((c: string) =>
+      c.startsWith('refreshToken='),
+    );
+    expect(refreshCookie).toBeDefined();
+    expect(refreshCookie).toContain('HttpOnly');
+  });
+
+  it('should not include refreshToken in the response body', async () => {
+    const password = 'securepassword123';
+    const passwordHash = await passwordHasher.hash(password);
+    const user = await persistUser(testDb, { passwordHash });
+
+    const response = await request(httpServer)
+      .post('/auth/login')
+      .send({ email: user.email, password })
+      .expect(200);
+
+    const body = bodyAs<Record<string, unknown>>(response);
+    expect(body).not.toHaveProperty('refreshToken');
   });
 
   it('should return 401 when using wrong password', async () => {
