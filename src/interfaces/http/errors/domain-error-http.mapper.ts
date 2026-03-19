@@ -1,4 +1,6 @@
 import { InvalidCredentialsError } from '@domain/auth/errors/invalid-credentials.error';
+import { InvalidRefreshTokenError } from '@domain/auth/errors/invalid-refresh-token.error';
+import { RefreshTokenReuseError } from '@domain/auth/errors/refresh-token-reuse.error';
 import { BarberNotFoundError } from '@domain/barber/errors/barber-not-found.error';
 import { UserAlreadyBarberError } from '@domain/barber/errors/user-already-barber.error';
 import { DependencyNotFoundError } from '@domain/errors/dependency-not-found.error';
@@ -15,6 +17,8 @@ export const errorStatusMap: Record<string, HttpStatus> = {
   [BarberNotFoundError.name]: HttpStatus.NOT_FOUND,
   [DependencyNotFoundError.name]: HttpStatus.NOT_FOUND,
   [InvalidCredentialsError.name]: HttpStatus.UNAUTHORIZED,
+  [InvalidRefreshTokenError.name]: HttpStatus.UNAUTHORIZED,
+  [RefreshTokenReuseError.name]: HttpStatus.UNAUTHORIZED,
   [InvalidReservationTimeError.name]: HttpStatus.UNPROCESSABLE_ENTITY,
   [InvalidUserEmailFormatError.name]: HttpStatus.BAD_REQUEST,
   [InvalidUserPasswordHashError.name]: HttpStatus.BAD_REQUEST,
