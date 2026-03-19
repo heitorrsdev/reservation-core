@@ -40,6 +40,7 @@ The decisions described here **reflect the actual state of the code at the time 
 | 0011 | Application-Controlled Timestamps    |
 | 0012 | Entity Factory Method Separation     |
 | 0013 | Stateless JWT Authentication         |
+| 0014 | Refresh Token Strategy               |
 
 
 
