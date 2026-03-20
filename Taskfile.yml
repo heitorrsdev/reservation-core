@@ -71,6 +71,14 @@ tasks:
         pnpm jest || (task test-down && exit 1)
       - task test-down
 
+  test-watch:
+    vars:
+      ENV: test
+    dotenv:
+      - .env.test
+    cmds:
+      - pnpm jest {{.FILES}} --runInBand
+
   # ─────────────────────────────────────────────
   # DEV
   # ─────────────────────────────────────────────
