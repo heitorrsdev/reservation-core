@@ -237,6 +237,9 @@ Tests must prioritize **behavioral verification and business invariants**, not i
 | `pnpm test` | Run all tests |
 | `pnpm test <file>` | Run a specific test file |
 | `task ci-test` | Full CI-grade test run with isolated DB |
+| `task test-watch` | Run one or more specific test files against the existing test database. Requires test-up and migrate to have been run first. Accepts multiple files via FILES='file1 file2'. |
+
+Note: prefer `task test-watch` over `task ci-test` when iterating on a specific test during development. Use `task ci-test` only for full verification before opening a PR.
 
 Critical domain flows must have integration coverage. Concurrency-sensitive logic (reservations) must always be tested.
 
