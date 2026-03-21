@@ -8,6 +8,11 @@ vars:
   PROD_COMPOSE: docker/docker-compose.prod.yml
   TEST_COMPOSE: docker/docker-compose.test.yml
   TREE_IGNORE: node_modules|.git|dist|*.env*
+  NODE_VERSION:
+    sh: cat .node-version
+
+env:
+  PATH: "{{.HOME}}/.local/share/fnm/node-versions/{{.NODE_VERSION}}/installation/bin:{{.PATH}}"
 
 tasks:
 
