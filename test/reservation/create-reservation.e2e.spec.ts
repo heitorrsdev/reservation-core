@@ -61,10 +61,7 @@ describe('ReservationController (e2e) - POST /reservations', () => {
     const endTime = new Date(startTime);
     endTime.setHours(11, 0, 0, 0);
 
-    const token = await getTokenForUser(
-      user.id as unknown as string,
-      user.email as unknown as string,
-    );
+    const token = await getTokenForUser(user.id, user.email);
 
     const response = await request(httpServer)
       .post('/reservations')
@@ -92,14 +89,8 @@ describe('ReservationController (e2e) - POST /reservations', () => {
     const endTime = new Date(startTime);
     endTime.setHours(11, 0, 0, 0);
 
-    const token1 = await getTokenForUser(
-      user1.id as unknown as string,
-      user1.email as unknown as string,
-    );
-    const token2 = await getTokenForUser(
-      user2.id as unknown as string,
-      user2.email as unknown as string,
-    );
+    const token1 = await getTokenForUser(user1.id, user1.email);
+    const token2 = await getTokenForUser(user2.id, user2.email);
 
     await request(httpServer)
       .post('/reservations')
@@ -135,10 +126,7 @@ describe('ReservationController (e2e) - POST /reservations', () => {
     const endTime = new Date(startTime);
     endTime.setHours(10, 0, 0, 0);
 
-    const token = await getTokenForUser(
-      user.id as unknown as string,
-      user.email as unknown as string,
-    );
+    const token = await getTokenForUser(user.id, user.email);
 
     await request(httpServer)
       .post('/reservations')
@@ -160,10 +148,7 @@ describe('ReservationController (e2e) - POST /reservations', () => {
     const endTime = new Date(startTime);
     endTime.setHours(11, 0, 0, 0);
 
-    const token = await getTokenForUser(
-      user.id as unknown as string,
-      user.email as unknown as string,
-    );
+    const token = await getTokenForUser(user.id, user.email);
 
     const response = await request(httpServer)
       .post('/reservations')
@@ -181,10 +166,7 @@ describe('ReservationController (e2e) - POST /reservations', () => {
 
   it('should return 400 when required fields are missing', async () => {
     const user = await persistUser(testDb);
-    const token = await getTokenForUser(
-      user.id as unknown as string,
-      user.email as unknown as string,
-    );
+    const token = await getTokenForUser(user.id, user.email);
     await request(httpServer)
       .post('/reservations')
       .set('Authorization', `Bearer ${token}`)
@@ -194,10 +176,7 @@ describe('ReservationController (e2e) - POST /reservations', () => {
 
   it('should return 400 when barberId is not a valid UUID', async () => {
     const user = await persistUser(testDb);
-    const token = await getTokenForUser(
-      user.id as unknown as string,
-      user.email as unknown as string,
-    );
+    const token = await getTokenForUser(user.id, user.email);
 
     const startTime = new Date();
     startTime.setHours(10, 0, 0, 0);
@@ -220,10 +199,7 @@ describe('ReservationController (e2e) - POST /reservations', () => {
     const barberUser = await persistUser(testDb);
     const barber = await persistBarber(testDb, { id: barberUser.id });
 
-    const token = await getTokenForUser(
-      user.id as unknown as string,
-      user.email as unknown as string,
-    );
+    const token = await getTokenForUser(user.id, user.email);
 
     await request(httpServer)
       .post('/reservations')
