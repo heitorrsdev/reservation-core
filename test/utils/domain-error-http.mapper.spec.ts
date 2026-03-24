@@ -11,7 +11,7 @@ describe('DomainErrorHttpMapper', () => {
     for (const errorName in errorStatusMap) {
       const mockError = {
         constructor: { name: errorName },
-      } as unknown as DomainError;
+      } as DomainError;
 
       const status = DomainErrorHttpMapper.toStatus(mockError);
 
