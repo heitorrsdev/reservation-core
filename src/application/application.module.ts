@@ -7,24 +7,27 @@ import { RefreshTokenUseCase } from './auth/refresh-token.usecase';
 import { CreateBarberUseCase } from './barber/create-barber.usecase';
 import { CreateReservationUseCase } from './reservation/create-reservation.usecase';
 import { CreateUserUseCase } from './user/create-user.usecase';
+import { GetUserMeUseCase } from './user/get-user-me.usecase';
 
 @Module({
   imports: [InfrastructureModule],
   providers: [
-    CreateUserUseCase,
     CreateBarberUseCase,
     CreateReservationUseCase,
+    CreateUserUseCase,
+    GetUserMeUseCase,
     LoginUseCase,
-    RefreshTokenUseCase,
     LogoutUseCase,
+    RefreshTokenUseCase,
   ],
   exports: [
-    CreateUserUseCase,
     CreateBarberUseCase,
     CreateReservationUseCase,
+    CreateUserUseCase,
+    GetUserMeUseCase,
     LoginUseCase,
-    RefreshTokenUseCase,
     LogoutUseCase,
+    RefreshTokenUseCase,
   ],
 })
 export class ApplicationModule {}
