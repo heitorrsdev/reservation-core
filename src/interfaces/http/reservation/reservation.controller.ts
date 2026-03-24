@@ -1,14 +1,17 @@
 import { CreateReservationUseCase } from '@application/reservation/create-reservation.usecase';
-import { Body, Controller, Post } from '@nestjs/common';
+import { GetReservationByIdUseCase } from '@application/reservation/get-reservation-by-id.usecase';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 
 import { User } from '../auth/user.decorator';
 import { CreatedResponseDto } from '../common/dto/created-response.dto';
 import { CreateReservationDto } from './dto/create-reservation.dto';
+import { GetReservationByIdResponseDto } from './dto/get-reservation-by-id-response.dto';
 
 @Controller('reservations')
 export class ReservationController {
   constructor(
     private readonly createReservationUseCase: CreateReservationUseCase,
+    private readonly getReservationByIdUseCase: GetReservationByIdUseCase,
   ) {}
 
   @Post()
@@ -22,5 +25,21 @@ export class ReservationController {
       startTime: new Date(body.startTime),
       endTime: new Date(body.endTime),
     });
+  }
+
+  @Get(':id')
+  async getById(
+    @Param('id') id: string,
+  ): Promise<GetReservationByIdResponseDto> {
+    const reservation = await this.getReservationByIdUseCase.execute({ id });
+
+    return {
+      id: reservation.id,
+      userId: reservation.userId,
+      barberId: reservation.barberId,
+      startTime: reservation.startTime,
+      endTime: reservation.endTime,
+      createdAt: reservation.createdAt,
+    };
   }
 }

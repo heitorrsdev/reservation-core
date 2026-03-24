@@ -1,10 +1,9 @@
 import { DomainError } from '@domain/errors/domain.error';
-import { HttpStatus } from '@nestjs/common';
-
 import {
   DomainErrorHttpMapper,
   errorStatusMap,
-} from '../../src/interfaces/http/errors/domain-error-http.mapper';
+} from '@http/errors/domain-error-http.mapper';
+import { HttpStatus } from '@nestjs/common';
 
 describe('DomainErrorHttpMapper', () => {
   it('should return the correct status for each mapped domain error', () => {

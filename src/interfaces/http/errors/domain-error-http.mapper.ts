@@ -8,6 +8,7 @@ import { DependencyNotFoundError } from '@domain/errors/dependency-not-found.err
 import type { DomainError } from '@domain/errors/domain.error';
 import { InvalidReservationTimeError } from '@domain/reservation/errors/invalid-reservation-time.error';
 import { ReservationConflictError } from '@domain/reservation/errors/reservation-conflict.error';
+import { ReservationNotFoundError } from '@domain/reservation/errors/reservation-not-found.error';
 import { InvalidUserEmailFormatError } from '@domain/user/errors/invalid-user-email-format.error';
 import { InvalidUserPasswordHashError } from '@domain/user/errors/invalid-user-password-hash.error';
 import { UserAlreadyExistsError } from '@domain/user/errors/user-already-exists.error';
@@ -25,6 +26,7 @@ export const errorStatusMap: Record<string, HttpStatus> = {
   [InvalidUserPasswordHashError.name]: HttpStatus.BAD_REQUEST,
   [RefreshTokenReuseError.name]: HttpStatus.UNAUTHORIZED,
   [ReservationConflictError.name]: HttpStatus.CONFLICT,
+  [ReservationNotFoundError.name]: HttpStatus.NOT_FOUND,
   [UserAlreadyBarberError.name]: HttpStatus.CONFLICT,
   [UserAlreadyExistsError.name]: HttpStatus.CONFLICT,
   [UserNotFoundError.name]: HttpStatus.NOT_FOUND,
