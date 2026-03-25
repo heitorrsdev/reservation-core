@@ -115,4 +115,4 @@ Implemented and in-progress use cases:
 
 ## License
 
-[MIT License](LICENSE)
+[Business Source License 1.1](LICENSE)
