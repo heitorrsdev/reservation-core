@@ -1,4 +1,3 @@
-BEGIN;
 
 -- Drop constraints that depend on TEXT ids
 
@@ -79,5 +78,3 @@ ALTER TABLE reservations
         barber_id WITH =,
         period WITH &&
     );
-
-COMMIT;
