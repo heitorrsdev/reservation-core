@@ -9,7 +9,7 @@ import { DATABASE } from '@infrastructure/database/database.token';
 import { PostgresErrorMapper } from '@infrastructure/database/postgres-error.mapper';
 import { reservations } from '@infrastructure/database/schema/reservation';
 import { Inject } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import { and, asc, count, eq, gte, lte } from 'drizzle-orm';
 
 import { ReservationMapper } from './reservation.mapper';
 
@@ -52,5 +52,36 @@ export class ReservationDrizzleRepository implements ReservationRepository {
     if (!result.length) return null;
 
     return ReservationMapper.toDomain(result[0]);
+  }
+
+  async findByBarberId(
+    barberId: string,
+    limit: number,
+    offset: number,
+    startTime?: Date,
+    endTime?: Date,
+  ): Promise<[Reservation[], number]> {
+    const conditions = [eq(reservations.barberId, barberId)];
+
+    if (startTime) conditions.push(gte(reservations.startTime, startTime));
+    if (endTime) conditions.push(lte(reservations.endTime, endTime));
+
+    const whereClause = and(...conditions);
+
+    const [rows, countResult] = await Promise.all([
+      this.db
+        .select()
+        .from(reservations)
+        .where(whereClause)
+        .orderBy(asc(reservations.startTime))
+        .limit(limit)
+        .offset(offset),
+      this.db.select({ count: count() }).from(reservations).where(whereClause),
+    ]);
+
+    const items = rows.map((row) => ReservationMapper.toDomain(row));
+    const total = Number(countResult[0].count);
+
+    return [items, total];
   }
 }
