@@ -51,3 +51,8 @@ The `schema_migrations` table is automatically created if it does not exist, eli
 
 - **External tools (Flyway, Liquibase)**  
   Rejected to maintain simplicity, local control, and less dependency on external tooling.
+
+## Notes
+
+- **High Volumetry (Concurrent Indexing):** The custom runner wraps each migration entirely inside a single transaction (`BEGIN` / `COMMIT`). PostgreSQL explicitly forbids running `CREATE INDEX CONCURRENTLY` inside transaction blocks. In a high-volumetry environment, standard index creation will lock large tables and cause downtime. The runner will need to be enhanced in the future to support non-transactional migrations.
+- **Distributed Locking:** The current implementation does not use `pg_advisory_lock`. In a horizontally scaled environment, multiple instances attempting to run migrations simultaneously might lead to race conditions.
