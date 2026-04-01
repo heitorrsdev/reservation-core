@@ -1,6 +1,16 @@
+import { CancelReservationUseCase } from '@application/reservation/cancel-reservation.usecase';
 import { CreateReservationUseCase } from '@application/reservation/create-reservation.usecase';
 import { GetReservationByIdUseCase } from '@application/reservation/get-reservation-by-id.usecase';
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+} from '@nestjs/common';
 
 import { User } from '../auth/user.decorator';
 import { CreatedResponseDto } from '../common/dto/created-response.dto';
@@ -10,6 +20,7 @@ import { GetReservationByIdResponseDto } from './dto/get-reservation-by-id-respo
 @Controller('reservations')
 export class ReservationController {
   constructor(
+    private readonly cancelReservationUseCase: CancelReservationUseCase,
     private readonly createReservationUseCase: CreateReservationUseCase,
     private readonly getReservationByIdUseCase: GetReservationByIdUseCase,
   ) {}
@@ -41,5 +52,17 @@ export class ReservationController {
       endTime: reservation.endTime,
       createdAt: reservation.createdAt,
     };
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async cancel(
+    @User() user: { sub: string; email: string },
+    @Param('id') id: string,
+  ): Promise<void> {
+    await this.cancelReservationUseCase.execute({
+      reservationId: id,
+      actorId: user.sub,
+    });
   }
 }
