@@ -19,7 +19,11 @@ export class ReservationDrizzleRepository implements ReservationRepository {
   async save(reservation: Reservation): Promise<void> {
     try {
       const data = ReservationMapper.toPersistence(reservation);
-      await this.db.insert(reservations).values(data);
+
+      await this.db.insert(reservations).values(data).onConflictDoUpdate({
+        target: reservations.id,
+        set: data,
+      });
     } catch (error: unknown) {
       if (PostgresErrorMapper.isExclusionViolation(error)) {
         throw new ReservationConflictError();
@@ -61,7 +65,10 @@ export class ReservationDrizzleRepository implements ReservationRepository {
     startTime?: Date,
     endTime?: Date,
   ): Promise<[Reservation[], number]> {
-    const conditions = [eq(reservations.barberId, barberId)];
+    const conditions = [
+      eq(reservations.barberId, barberId),
+      eq(reservations.status, 'active'),
+    ];
 
     if (startTime) conditions.push(gte(reservations.startTime, startTime));
     if (endTime) conditions.push(lte(reservations.endTime, endTime));
