@@ -3,35 +3,43 @@ import { reservations } from '@infrastructure/database/schema/reservation';
 import { TEST_TIME } from '@test/utils/time';
 import { randomUUID } from 'crypto';
 
-type ReservationInsert = typeof reservations.$inferInsert;
-type ReservationFactoryInput = { userId: string; barberId: string } & Partial<
-  Omit<ReservationInsert, 'userId' | 'barberId'>
->;
+type ReservationRow = typeof reservations.$inferSelect;
+
+type ReservationFactoryInput = {
+  userId: string;
+  barberId: string;
+  startTime?: Date;
+  endTime?: Date;
+  status?: ReservationRow['status'];
+};
 
 export function buildReservation(
   input: ReservationFactoryInput,
-): ReservationInsert {
-  const id = input.id ?? randomUUID();
+): ReservationRow {
   const startTime = input.startTime ?? TEST_TIME;
   const endTime =
     input.endTime ?? new Date(startTime.getTime() + 60 * 60 * 1000);
-  const createdAt = input.createdAt ?? TEST_TIME;
+
+  const status: ReservationRow['status'] = input.status ?? 'active';
 
   return {
-    id,
+    id: randomUUID(),
     userId: input.userId,
     barberId: input.barberId,
     startTime,
     endTime,
-    createdAt,
+    createdAt: TEST_TIME,
+    status,
   };
 }
 
 export async function persistReservation(
   db: Database,
   input: ReservationFactoryInput,
-) {
-  const data = buildReservation(input);
-  await db.insert(reservations).values(data);
-  return data;
+): Promise<ReservationRow> {
+  const row = buildReservation(input);
+
+  await db.insert(reservations).values(row);
+
+  return row;
 }

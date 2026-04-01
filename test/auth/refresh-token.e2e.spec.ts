@@ -7,13 +7,13 @@ import { Test } from '@nestjs/testing';
 import { persistUser } from '@test/factories/user.factory';
 import { bodyAs } from '@test/utils/http-response';
 import { testDb } from '@test/utils/infra/test-database';
+import { truncateTestDatabase } from '@test/utils/infra/truncate-test-db';
 import { eq } from 'drizzle-orm';
 import request from 'supertest';
 import type { App } from 'supertest/types';
 
 import { configureApp } from '../../src/app.config';
 import { AppModule } from '../../src/app.module';
-import { truncateTestDatabase } from '../utils/infra/truncate-test-db';
 
 function extractRefreshCookie(response: request.Response): string {
   const cookies = response.headers['set-cookie'] as unknown as string[];
