@@ -12,6 +12,7 @@ export class ReservationMapper {
       startTime: row.startTime,
       endTime: row.endTime,
       createdAt: row.createdAt,
+      status: row.status,
     });
   }
 
@@ -23,6 +24,7 @@ export class ReservationMapper {
       startTime: reservation.startTime,
       endTime: reservation.endTime,
       createdAt: reservation.createdAt,
+      status: reservation.status,
     };
   }
 }

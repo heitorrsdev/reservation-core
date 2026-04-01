@@ -1,4 +1,9 @@
-import { pgTable, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { pgEnum, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core';
+
+export const reservationStatusEnum = pgEnum('reservation_status', [
+  'active',
+  'cancelled',
+]);
 
 export const reservations = pgTable('reservations', {
   id: uuid('id').primaryKey(),
@@ -9,4 +14,6 @@ export const reservations = pgTable('reservations', {
   endTime: timestamp('end_time', { withTimezone: true }).notNull(),
 
   createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+
+  status: reservationStatusEnum('status').notNull().default('active'),
 });

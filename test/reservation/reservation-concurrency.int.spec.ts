@@ -1,5 +1,6 @@
 import { ReservationConflictError } from '@domain/reservation/errors/reservation-conflict.error';
 import { ReservationDrizzleRepository } from '@infrastructure/reservation/reservation.drizzle-repository';
+import { ReservationMapper } from '@infrastructure/reservation/reservation.mapper';
 import { persistBarber } from '@test/factories/barber.factory';
 import { buildReservation } from '@test/factories/reservation.factory';
 import { persistUser } from '@test/factories/user.factory';
@@ -23,12 +24,14 @@ it('should prevent double booking under real concurrency', async () => {
 
   const barrier = new Barrier(users.length);
   const tasks = users.map(async (user): Promise<void> => {
-    const reservation = buildReservation({
+    const rawData = buildReservation({
       barberId: barber.id,
       userId: user.id,
       startTime: start,
       endTime: end,
     });
+
+    const reservation = ReservationMapper.toDomain(rawData);
 
     return testDb.transaction(async (tx): Promise<void> => {
       const txRepo = new ReservationDrizzleRepository(tx);

@@ -4,12 +4,12 @@ import type { INestApplication } from '@nestjs/common';
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
 import { bodyAs } from '@test/utils/http-response';
+import { truncateTestDatabase } from '@test/utils/infra/truncate-test-db';
 import request from 'supertest';
 import type { App } from 'supertest/types';
 
 import { configureApp } from '../../src/app.config';
 import { AppModule } from '../../src/app.module';
-import { truncateTestDatabase } from '../utils/infra/truncate-test-db';
 
 describe('UserController (e2e) - POST /users', () => {
   let app: INestApplication;

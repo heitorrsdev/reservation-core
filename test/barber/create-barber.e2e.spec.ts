@@ -9,12 +9,12 @@ import { persistBarber } from '@test/factories/barber.factory';
 import { persistUser } from '@test/factories/user.factory';
 import { bodyAs } from '@test/utils/http-response';
 import { testDb } from '@test/utils/infra/test-database';
+import { truncateTestDatabase } from '@test/utils/infra/truncate-test-db';
 import request from 'supertest';
 import type { App } from 'supertest/types';
 
 import { configureApp } from '../../src/app.config';
 import { AppModule } from '../../src/app.module';
-import { truncateTestDatabase } from '../utils/infra/truncate-test-db';
 
 describe('BarberController (e2e) - POST /barbers', () => {
   let app: INestApplication;

@@ -6,6 +6,7 @@ import { LogoutUseCase } from './auth/logout.usecase';
 import { RefreshTokenUseCase } from './auth/refresh-token.usecase';
 import { CreateBarberUseCase } from './barber/create-barber.usecase';
 import { GetBarberByIdUseCase } from './barber/get-barber-by-id.usecase';
+import { CancelReservationUseCase } from './reservation/cancel-reservation.usecase';
 import { CreateReservationUseCase } from './reservation/create-reservation.usecase';
 import { GetBarberReservationsUseCase } from './reservation/get-barber-reservations.usecase';
 import { GetReservationByIdUseCase } from './reservation/get-reservation-by-id.usecase';
@@ -15,6 +16,7 @@ import { GetUserMeUseCase } from './user/get-user-me.usecase';
 @Module({
   imports: [InfrastructureModule],
   providers: [
+    CancelReservationUseCase,
     CreateBarberUseCase,
     CreateReservationUseCase,
     CreateUserUseCase,
@@ -27,6 +29,7 @@ import { GetUserMeUseCase } from './user/get-user-me.usecase';
     RefreshTokenUseCase,
   ],
   exports: [
+    CancelReservationUseCase,
     CreateBarberUseCase,
     CreateReservationUseCase,
     CreateUserUseCase,
