@@ -9,12 +9,12 @@ import { persistBarber } from '@test/factories/barber.factory';
 import { persistUser } from '@test/factories/user.factory';
 import { bodyAs } from '@test/utils/http-response';
 import { testDb } from '@test/utils/infra/test-database';
+import { truncateTestDatabase } from '@test/utils/infra/truncate-test-db';
 import request from 'supertest';
 import type { App } from 'supertest/types';
 
 import { configureApp } from '../../src/app.config';
 import { AppModule } from '../../src/app.module';
-import { truncateTestDatabase } from '../utils/infra/truncate-test-db';
 
 describe('ReservationController (e2e) - POST /reservations', () => {
   let app: INestApplication;
@@ -210,5 +210,57 @@ describe('ReservationController (e2e) - POST /reservations', () => {
         endTime: 'not-a-date-either',
       })
       .expect(400);
+  });
+
+  it('should allow booking a timeslot that was freed by a cancelled reservation', async () => {
+    const user1 = await persistUser(testDb);
+    const user2 = await persistUser(testDb);
+    const barberUser = await persistUser(testDb);
+    const barber = await persistBarber(testDb, { id: barberUser.id });
+
+    const startTime = new Date();
+    startTime.setHours(startTime.getHours() + 2, 0, 0, 0); // future
+    const endTime = new Date(startTime);
+    endTime.setHours(startTime.getHours() + 1, 0, 0, 0);
+
+    const token1 = await getTokenForUser(user1.id, user1.email);
+    const token2 = await getTokenForUser(user2.id, user2.email);
+
+    const createResponse = await request(httpServer)
+      .post('/reservations')
+      .set('Authorization', `Bearer ${token1}`)
+      .send({
+        barberId: barber.id,
+        startTime: startTime.toISOString(),
+        endTime: endTime.toISOString(),
+      })
+      .expect(201);
+
+    const reservationId = bodyAs<CreatedResponseDto>(createResponse).id;
+
+    await request(httpServer)
+      .post('/reservations')
+      .set('Authorization', `Bearer ${token2}`)
+      .send({
+        barberId: barber.id,
+        startTime: startTime.toISOString(),
+        endTime: endTime.toISOString(),
+      })
+      .expect(409);
+
+    await request(httpServer)
+      .delete(`/reservations/${reservationId}`)
+      .set('Authorization', `Bearer ${token1}`)
+      .expect(204);
+
+    await request(httpServer)
+      .post('/reservations')
+      .set('Authorization', `Bearer ${token2}`)
+      .send({
+        barberId: barber.id,
+        startTime: startTime.toISOString(),
+        endTime: endTime.toISOString(),
+      })
+      .expect(201);
   });
 });
