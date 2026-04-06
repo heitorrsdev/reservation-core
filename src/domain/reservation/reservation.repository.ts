@@ -10,4 +10,5 @@ export interface ReservationRepository {
     startTime?: Date,
     endTime?: Date,
   ): Promise<[Reservation[], number]>;
+  findManyByUserId(userId: string): Promise<Reservation[]>;
 }
