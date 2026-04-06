@@ -91,4 +91,14 @@ export class ReservationDrizzleRepository implements ReservationRepository {
 
     return [items, total];
   }
+
+  async findManyByUserId(userId: string): Promise<Reservation[]> {
+    const rows = await this.db
+      .select()
+      .from(reservations)
+      .where(eq(reservations.userId, userId))
+      .orderBy(asc(reservations.startTime));
+
+    return rows.map((row) => ReservationMapper.toDomain(row));
+  }
 }

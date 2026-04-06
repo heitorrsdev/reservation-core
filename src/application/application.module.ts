@@ -10,6 +10,7 @@ import { CancelReservationUseCase } from './reservation/cancel-reservation.useca
 import { CreateReservationUseCase } from './reservation/create-reservation.usecase';
 import { GetBarberReservationsUseCase } from './reservation/get-barber-reservations.usecase';
 import { GetReservationByIdUseCase } from './reservation/get-reservation-by-id.usecase';
+import { GetUserReservationsUseCase } from './reservation/get-user-reservations.usecase';
 import { CreateUserUseCase } from './user/create-user.usecase';
 import { GetUserMeUseCase } from './user/get-user-me.usecase';
 
@@ -24,6 +25,7 @@ import { GetUserMeUseCase } from './user/get-user-me.usecase';
     GetBarberReservationsUseCase,
     GetReservationByIdUseCase,
     GetUserMeUseCase,
+    GetUserReservationsUseCase,
     LoginUseCase,
     LogoutUseCase,
     RefreshTokenUseCase,
@@ -37,6 +39,7 @@ import { GetUserMeUseCase } from './user/get-user-me.usecase';
     GetBarberReservationsUseCase,
     GetReservationByIdUseCase,
     GetUserMeUseCase,
+    GetUserReservationsUseCase,
     LoginUseCase,
     LogoutUseCase,
     RefreshTokenUseCase,
