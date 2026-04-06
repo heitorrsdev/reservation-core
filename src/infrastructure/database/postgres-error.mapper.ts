@@ -6,7 +6,7 @@ export class PostgresErrorMapper {
       typeof error === 'object' &&
       error !== null &&
       'code' in error &&
-      typeof error.code === 'string'
+      typeof (error as Record<string, unknown>).code === 'string'
     );
   }
 
@@ -17,10 +17,9 @@ export class PostgresErrorMapper {
       return error.code;
     }
 
-    // Drizzle wraps pg errors inside `cause`
-    if ('cause' in error && error.cause && typeof error.cause === 'object') {
-      const cause = error.cause as { code?: unknown };
-      if (typeof cause.code === 'string') {
+    if ('cause' in error) {
+      const cause = (error as { cause: unknown }).cause;
+      if (this.isPostgresError(cause)) {
         return cause.code;
       }
     }
@@ -34,8 +33,8 @@ export class PostgresErrorMapper {
     }
 
     if (typeof error === 'object' && error !== null && 'cause' in error) {
-      const cause = error.cause as { detail?: unknown };
-      if (typeof cause.detail === 'string') {
+      const cause = (error as { cause: unknown }).cause;
+      if (this.isPostgresError(cause) && cause.detail) {
         return cause.detail;
       }
     }
@@ -49,7 +48,7 @@ export class PostgresErrorMapper {
     const detail = this.extractDetail(error);
     if (!detail) return null;
 
-    const match = detail.match(/Key \((.+)\)=\((.+)\) is not present/);
+    const match = detail.match(/Key \(([^)]+)\)=\(([^)]+)\)/);
     if (!match) return null;
 
     return {
@@ -76,5 +75,22 @@ export class PostgresErrorMapper {
 
   static isExclusionViolation(error: unknown): boolean {
     return this.extractCode(error) === '23P01';
+  }
+
+  static isDeadlock(error: unknown): boolean {
+    return this.extractCode(error) === '40P01';
+  }
+
+  static isSerializationFailure(error: unknown): boolean {
+    return this.extractCode(error) === '40001';
+  }
+
+  static isConcurrencyError(error: unknown): boolean {
+    return (
+      this.isDeadlock(error) ||
+      this.isSerializationFailure(error) ||
+      this.isUniqueViolation(error) ||
+      this.isExclusionViolation(error)
+    );
   }
 }
