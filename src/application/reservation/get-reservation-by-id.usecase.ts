@@ -1,4 +1,5 @@
 import { ReservationNotFoundError } from '@domain/reservation/errors/reservation-not-found.error';
+import { UnauthorizedReservationAccessError } from '@domain/reservation/errors/unauthorized-reservation-access.error';
 import { Reservation } from '@domain/reservation/reservation.entity';
 import { ReservationRepository } from '@domain/reservation/reservation.repository';
 import { Inject } from '@nestjs/common';
@@ -17,6 +18,13 @@ export class GetReservationByIdUseCase {
 
     if (!reservation) {
       throw new ReservationNotFoundError(command.id);
+    }
+
+    if (
+      reservation.userId !== command.actorId &&
+      reservation.barberId !== command.actorId
+    ) {
+      throw new UnauthorizedReservationAccessError();
     }
 
     return reservation;
