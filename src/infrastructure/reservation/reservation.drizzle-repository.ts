@@ -25,7 +25,7 @@ export class ReservationDrizzleRepository implements ReservationRepository {
         set: data,
       });
     } catch (error: unknown) {
-      if (PostgresErrorMapper.isExclusionViolation(error)) {
+      if (PostgresErrorMapper.isConcurrencyError(error)) {
         throw new ReservationConflictError();
       }
 
