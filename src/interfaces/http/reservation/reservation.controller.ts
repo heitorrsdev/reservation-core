@@ -40,9 +40,13 @@ export class ReservationController {
 
   @Get(':id')
   async getById(
+    @User() user: { sub: string; email: string },
     @Param('id') id: string,
   ): Promise<GetReservationByIdResponseDto> {
-    const reservation = await this.getReservationByIdUseCase.execute({ id });
+    const reservation = await this.getReservationByIdUseCase.execute({
+      id,
+      actorId: user.sub,
+    });
 
     return {
       id: reservation.id,

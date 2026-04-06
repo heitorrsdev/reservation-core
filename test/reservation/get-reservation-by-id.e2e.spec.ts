@@ -92,6 +92,37 @@ describe('ReservationController (e2e) - GET /reservations/:id', () => {
     await request(httpServer).get('/reservations/any-id').expect(401);
   });
 
+  it('should return 403 when authenticated but not owner or barber', async () => {
+    const owner = await persistUser(testDb);
+    const barberUser = await persistUser(testDb);
+    const barber = await persistBarber(testDb, { id: barberUser.id });
+
+    const startTime = new Date();
+    startTime.setHours(10, 0, 0, 0);
+    const endTime = new Date(startTime);
+    endTime.setHours(11, 0, 0, 0);
+
+    const reservation = await persistReservation(testDb, {
+      userId: owner.id,
+      barberId: barber.id,
+      startTime,
+      endTime,
+    });
+
+    const maliciousUser = await persistUser(testDb);
+    const token = await getTokenForUser(maliciousUser.id, maliciousUser.email);
+
+    const response = await request(httpServer)
+      .get(`/reservations/${reservation.id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(403);
+
+    const body = bodyAs<ErrorResponseDto>(response);
+    expect(body.message).toContain(
+      'You are not authorized to access this reservation',
+    );
+  });
+
   it('should return 404 when reservation is not found', async () => {
     const user = await persistUser(testDb);
     const token = await getTokenForUser(user.id, user.email);
