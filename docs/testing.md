@@ -8,11 +8,11 @@ The goal is not only to test isolated logic, but to verify that **architectural 
 
 ## Test File Naming Conventions
 
-| Suffix         | Meaning           | Scope                                  |
-| -------------- | ----------------- | -------------------------------------- |
+| Suffix          | Meaning           | Scope                                  |
+| --------------- | ----------------- | -------------------------------------- |
 | `.unit.spec.ts` | Unit tests        | Domain / pure logic                    |
-| `.int.spec.ts` | Integration tests | Database, repositories, infrastructure |
-| `.e2e.spec.ts` | End-to-end tests  | HTTP / NestJS application layer        |
+| `.int.spec.ts`  | Integration tests | Database, repositories, infrastructure |
+| `.e2e.spec.ts`  | End-to-end tests  | HTTP / NestJS application layer        |
 
 Test folders mirror bounded contexts (e.g., `test/reservation`, `test/user`).
 
