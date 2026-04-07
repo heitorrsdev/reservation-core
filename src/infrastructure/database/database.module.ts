@@ -1,6 +1,7 @@
+import type { OnApplicationShutdown } from '@nestjs/common';
 import { Module } from '@nestjs/common';
 
-import { createDatabase } from './database.provider';
+import { closeDatabase, createDatabase } from './database.provider';
 import { DATABASE } from './database.token';
 
 @Module({
@@ -12,4 +13,8 @@ import { DATABASE } from './database.token';
   ],
   exports: [DATABASE],
 })
-export class DatabaseModule {}
+export class DatabaseModule implements OnApplicationShutdown {
+  async onApplicationShutdown() {
+    await closeDatabase();
+  }
+}

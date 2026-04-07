@@ -6,11 +6,12 @@ import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { AuthController } from './auth/auth.controller';
 import { BarberController } from './barber/barber.controller';
 import { GlobalExceptionFilter } from './filters/global-exception.filter';
+import { HealthModule } from './health/health.module';
 import { ReservationController } from './reservation/reservation.controller';
 import { UserController } from './user/user.controller';
 
 @Module({
-  imports: [ApplicationModule],
+  imports: [ApplicationModule, HealthModule],
   controllers: [
     AuthController,
     UserController,
