@@ -5,6 +5,7 @@ import { LoginUseCase } from './auth/login.usecase';
 import { LogoutUseCase } from './auth/logout.usecase';
 import { RefreshTokenUseCase } from './auth/refresh-token.usecase';
 import { CreateBarberUseCase } from './barber/create-barber.usecase';
+import { GetAllBarbersUseCase } from './barber/get-all-barbers.usecase';
 import { GetBarberByIdUseCase } from './barber/get-barber-by-id.usecase';
 import { CancelReservationUseCase } from './reservation/cancel-reservation.usecase';
 import { CreateReservationUseCase } from './reservation/create-reservation.usecase';
@@ -21,6 +22,7 @@ import { GetUserMeUseCase } from './user/get-user-me.usecase';
     CreateBarberUseCase,
     CreateReservationUseCase,
     CreateUserUseCase,
+    GetAllBarbersUseCase,
     GetBarberByIdUseCase,
     GetBarberReservationsUseCase,
     GetReservationByIdUseCase,
@@ -35,6 +37,7 @@ import { GetUserMeUseCase } from './user/get-user-me.usecase';
     CreateBarberUseCase,
     CreateReservationUseCase,
     CreateUserUseCase,
+    GetAllBarbersUseCase,
     GetBarberByIdUseCase,
     GetBarberReservationsUseCase,
     GetReservationByIdUseCase,
