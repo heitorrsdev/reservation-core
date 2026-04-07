@@ -24,6 +24,8 @@ const COOKIE_OPTIONS = {
   path: '/auth',
 };
 
+const REFRESH_TOKEN_COOKIE_NAME = 'refreshToken';
+
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -45,7 +47,7 @@ export class AuthController {
         password: body.password,
       });
 
-    res.cookie('refreshToken', refreshToken, {
+    res.cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
       ...COOKIE_OPTIONS,
       expires: expiresAt,
     });
@@ -68,7 +70,7 @@ export class AuthController {
 
     const result = await this.refreshTokenUseCase.execute({ refreshToken });
 
-    res.cookie('refreshToken', result.refreshToken, {
+    res.cookie(REFRESH_TOKEN_COOKIE_NAME, result.refreshToken, {
       ...COOKIE_OPTIONS,
       expires: result.expiresAt,
     });
@@ -91,6 +93,6 @@ export class AuthController {
 
     await this.logoutUseCase.execute({ refreshToken });
 
-    res.clearCookie('refreshToken', COOKIE_OPTIONS);
+    res.clearCookie(REFRESH_TOKEN_COOKIE_NAME, COOKIE_OPTIONS);
   }
 }
