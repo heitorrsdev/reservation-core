@@ -1,10 +1,10 @@
-import { InfrastructureModule } from '@infrastructure/infrastructure.module';
+import { DatabaseModule } from '@infrastructure/database/database.module';
 import { Module } from '@nestjs/common';
 
 import { HealthController } from './health.controller';
 
 @Module({
-  imports: [InfrastructureModule],
+  imports: [DatabaseModule],
   controllers: [HealthController],
 })
 export class HealthModule {}
