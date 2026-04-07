@@ -3,6 +3,7 @@ import { ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 
 export function configureApp(app: INestApplication) {
+  app.enableShutdownHooks();
   app.use(cookieParser());
   app.enableCors({
     origin:
