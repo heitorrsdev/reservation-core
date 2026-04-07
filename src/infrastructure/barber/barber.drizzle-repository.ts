@@ -39,4 +39,13 @@ export class BarberDrizzleRepository implements BarberRepository {
 
     return BarberMapper.toDomain(result[0]);
   }
+
+  async findAllActive(): Promise<Barber[]> {
+    const results = await this.db
+      .select()
+      .from(barbers)
+      .where(eq(barbers.active, true));
+
+    return results.map((result) => BarberMapper.toDomain(result));
+  }
 }

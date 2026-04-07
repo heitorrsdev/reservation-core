@@ -1,4 +1,5 @@
 import { CreateBarberUseCase } from '@application/barber/create-barber.usecase';
+import { GetAllBarbersUseCase } from '@application/barber/get-all-barbers.usecase';
 import { GetBarberByIdUseCase } from '@application/barber/get-barber-by-id.usecase';
 import { GetBarberReservationsUseCase } from '@application/reservation/get-barber-reservations.usecase';
 import {
@@ -15,6 +16,7 @@ import {
 import { User } from '../auth/user.decorator';
 import { CreatedResponseDto } from '../common/dto/created-response.dto';
 import { CreateBarberDto } from './dto/create-barber.dto';
+import { GetAllBarbersResponseDto } from './dto/get-all-barbers-response.dto';
 import { GetBarberByIdResponseDto } from './dto/get-barber-by-id-response.dto';
 import { GetBarberReservationsQueryDto } from './dto/get-barber-reservations-query.dto';
 import { GetBarberReservationsResponseDto } from './dto/get-barber-reservations-response.dto';
@@ -23,6 +25,7 @@ import { GetBarberReservationsResponseDto } from './dto/get-barber-reservations-
 export class BarberController {
   constructor(
     private readonly createBarberUseCase: CreateBarberUseCase,
+    private readonly getAllBarbersUseCase: GetAllBarbersUseCase,
     private readonly getBarberByIdUseCase: GetBarberByIdUseCase,
     private readonly getBarberReservationsUseCase: GetBarberReservationsUseCase,
   ) {}
@@ -35,6 +38,19 @@ export class BarberController {
       name: dto.name,
       bio: dto.bio,
     });
+  }
+
+  @Get()
+  async getAll(): Promise<GetAllBarbersResponseDto> {
+    const barbers = await this.getAllBarbersUseCase.execute();
+
+    return {
+      data: barbers.map((barber) => ({
+        id: barber.id,
+        name: barber.name,
+        bio: barber.bio,
+      })),
+    };
   }
 
   @Get(':id')
