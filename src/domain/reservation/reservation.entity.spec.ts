@@ -1,9 +1,9 @@
-import { Reservation } from './reservation.entity';
 import { CannotCancelPastReservationError } from './errors/cannot-cancel-past-reservation.error';
 import { ClientLateCancellationError } from './errors/client-late-cancellation.error';
 import { InvalidReservationTimeError } from './errors/invalid-reservation-time.error';
 import { ReservationAlreadyCancelledError } from './errors/reservation-already-cancelled.error';
 import { UnauthorizedReservationAccessError } from './errors/unauthorized-reservation-access.error';
+import { Reservation } from './reservation.entity';
 
 describe('Reservation Entity', () => {
   const userId = 'user-1';

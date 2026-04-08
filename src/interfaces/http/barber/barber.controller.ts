@@ -12,6 +12,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { User } from '../auth/user.decorator';
 import { CreatedResponseDto } from '../common/dto/created-response.dto';
@@ -21,6 +22,8 @@ import { GetBarberByIdResponseDto } from './dto/get-barber-by-id-response.dto';
 import { GetBarberReservationsQueryDto } from './dto/get-barber-reservations-query.dto';
 import { GetBarberReservationsResponseDto } from './dto/get-barber-reservations-response.dto';
 
+@ApiTags('Barbers')
+@ApiBearerAuth()
 @Controller('barbers')
 export class BarberController {
   constructor(

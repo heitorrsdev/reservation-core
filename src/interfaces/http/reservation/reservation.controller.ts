@@ -11,12 +11,15 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { User } from '../auth/user.decorator';
 import { CreatedResponseDto } from '../common/dto/created-response.dto';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { GetReservationByIdResponseDto } from './dto/get-reservation-by-id-response.dto';
 
+@ApiTags('Reservations')
+@ApiBearerAuth()
 @Controller('reservations')
 export class ReservationController {
   constructor(

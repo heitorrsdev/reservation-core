@@ -1,3 +1,5 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 export class BarberReservationFullDto {
   id: string;
   userId: string;
@@ -19,6 +21,11 @@ export class PaginationMetaDto {
 }
 
 export class GetBarberReservationsResponseDto {
+  @ApiProperty({
+    type: 'array',
+    items: { type: 'object', additionalProperties: true },
+  })
   data: BarberReservationFullDto[] | BarberReservationSlotDto[];
+
   meta: PaginationMetaDto;
 }
