@@ -11,6 +11,7 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 
 import { LoginDto } from './dto/login.dto';
@@ -26,6 +27,7 @@ const COOKIE_OPTIONS = {
 
 const REFRESH_TOKEN_COOKIE_NAME = 'refreshToken';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(

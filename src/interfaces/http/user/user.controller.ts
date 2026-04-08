@@ -9,6 +9,7 @@ import {
   HttpStatus,
   Post,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Public } from '../auth/public.decorator';
 import { User } from '../auth/user.decorator';
@@ -17,6 +18,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { GetUserMeResponseDto } from './dto/get-user-me-response.dto';
 import { GetUserReservationsResponseDto } from './dto/get-user-reservations-response.dto';
 
+@ApiTags('Users')
 @Controller('users')
 export class UserController {
   constructor(
@@ -35,6 +37,7 @@ export class UserController {
     });
   }
 
+  @ApiBearerAuth()
   @Get('me')
   async getMe(@User() user: { sub: string }): Promise<GetUserMeResponseDto> {
     const userEntity = await this.getUserMeUseCase.execute({ id: user.sub });
@@ -46,6 +49,7 @@ export class UserController {
     };
   }
 
+  @ApiBearerAuth()
   @Get('me/reservations')
   async getMyReservations(
     @User() user: { sub: string },
