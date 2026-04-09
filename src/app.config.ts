@@ -1,9 +1,18 @@
 import type { INestApplication } from '@nestjs/common';
 import { ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 
 export function configureApp(app: INestApplication) {
   app.enableShutdownHooks();
+
+  app.use(
+    helmet({
+      contentSecurityPolicy:
+        process.env.NODE_ENV === 'production' ? undefined : false,
+    }),
+  );
+
   app.use(cookieParser());
   app.enableCors({
     origin:
