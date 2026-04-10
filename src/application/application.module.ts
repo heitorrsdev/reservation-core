@@ -12,6 +12,7 @@ import { CreateReservationUseCase } from './reservation/create-reservation.useca
 import { GetBarberReservationsUseCase } from './reservation/get-barber-reservations.usecase';
 import { GetReservationByIdUseCase } from './reservation/get-reservation-by-id.usecase';
 import { GetUserReservationsUseCase } from './reservation/get-user-reservations.usecase';
+import { RescheduleReservationUseCase } from './reservation/reschedule-reservation.usecase';
 import { CreateUserUseCase } from './user/create-user.usecase';
 import { GetUserMeUseCase } from './user/get-user-me.usecase';
 
@@ -31,6 +32,7 @@ import { GetUserMeUseCase } from './user/get-user-me.usecase';
     LoginUseCase,
     LogoutUseCase,
     RefreshTokenUseCase,
+    RescheduleReservationUseCase,
   ],
   exports: [
     CancelReservationUseCase,
@@ -46,6 +48,7 @@ import { GetUserMeUseCase } from './user/get-user-me.usecase';
     LoginUseCase,
     LogoutUseCase,
     RefreshTokenUseCase,
+    RescheduleReservationUseCase,
   ],
 })
 export class ApplicationModule {}

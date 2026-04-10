@@ -189,3 +189,32 @@ It describes the expected business rules that impact schema, queries, and valida
 * Refresh tokens are **stateful** and stored as a hash in the database (see ADR-0014)
 * Refresh tokens must **never be persisted in plain text**
 * Invalid credentials result in a generic authentication error (no distinction between wrong email and wrong password)
+
+---
+
+## UC-09 — Reschedule Reservation
+
+**Actor:** Client or Barber
+
+### Primary Flow
+
+1. System receives a reservation ID, the actor's ID, new `start_time`, and new `end_time`
+2. System verifies if the reservation exists
+3. System validates authorization:
+   * Client can only reschedule **their own** reservation
+   * Barber can only reschedule reservations **assigned to them**
+4. System validates the reservation is not in the past (`currentTime >= original start_time` is rejected)
+5. System validates client did not request a reschedule with less than 1 hour of notice
+6. System validates that `new_end_time > new_start_time`
+7. System checks for scheduling conflicts for the barber in the new time window
+8. Reservation times are updated successfully
+
+### Business Rules
+
+* **Cancelled reservations cannot be rescheduled** — throws a conflict error
+* **IDOR protection** must be enforced — only the owning client or the assigned barber may reschedule
+* Reservations whose **original `start_time` is already in the past** cannot be rescheduled
+* **Clients** cannot reschedule with **less than 1 hour** of notice before the original `start_time`
+* **Barbers** are not subject to the 1-hour notice restriction
+* `new_end_time` must be strictly after `new_start_time`
+* Rescheduling to a **conflicting time window** (overlap with another active reservation for the same barber) is rejected via database exclusion constraint

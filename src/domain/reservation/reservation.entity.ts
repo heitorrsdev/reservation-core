@@ -1,6 +1,8 @@
 import { randomUUID } from 'crypto';
 
 import { CannotCancelPastReservationError } from './errors/cannot-cancel-past-reservation.error';
+import { CannotRescheduleCancelledReservationError } from './errors/cannot-reschedule-cancelled-reservation.error';
+import { CannotReschedulePastReservationError } from './errors/cannot-reschedule-past-reservation.error';
 import { ClientLateCancellationError } from './errors/client-late-cancellation.error';
 import { InvalidReservationTimeError } from './errors/invalid-reservation-time.error';
 import { ReservationAlreadyCancelledError } from './errors/reservation-already-cancelled.error';
@@ -10,17 +12,29 @@ export type ReservationStatus = 'active' | 'cancelled';
 
 export class Reservation {
   private _status: ReservationStatus;
+  private _startTime: Date;
+  private _endTime: Date;
 
   private constructor(
     readonly id: string,
     readonly userId: string,
     readonly barberId: string,
-    readonly startTime: Date,
-    readonly endTime: Date,
+    startTime: Date,
+    endTime: Date,
     readonly createdAt: Date,
     status: ReservationStatus,
   ) {
     this._status = status;
+    this._startTime = startTime;
+    this._endTime = endTime;
+  }
+
+  get startTime(): Date {
+    return this._startTime;
+  }
+
+  get endTime(): Date {
+    return this._endTime;
   }
 
   get status(): ReservationStatus {
@@ -53,6 +67,44 @@ export class Reservation {
     }
 
     this._status = 'cancelled';
+  }
+
+  public reschedule(
+    newStartTime: Date,
+    newEndTime: Date,
+    actorId: string,
+    currentTime: Date,
+  ): void {
+    if (this._status === 'cancelled') {
+      throw new CannotRescheduleCancelledReservationError();
+    }
+
+    const isClient = actorId === this.userId;
+    const isBarber = actorId === this.barberId;
+
+    if (!isClient && !isBarber) {
+      throw new UnauthorizedReservationAccessError();
+    }
+
+    if (currentTime >= this._startTime) {
+      throw new CannotReschedulePastReservationError();
+    }
+
+    if (isClient) {
+      const limitTimeForClient = new Date(
+        this._startTime.getTime() - 60 * 60 * 1000,
+      );
+      if (currentTime >= limitTimeForClient) {
+        throw new ClientLateCancellationError();
+      }
+    }
+
+    if (newEndTime <= newStartTime) {
+      throw new InvalidReservationTimeError();
+    }
+
+    this._startTime = newStartTime;
+    this._endTime = newEndTime;
   }
 
   static create(props: {

@@ -7,6 +7,8 @@ import { UserAlreadyBarberError } from '@domain/barber/errors/user-already-barbe
 import { DependencyNotFoundError } from '@domain/errors/dependency-not-found.error';
 import type { DomainError } from '@domain/errors/domain.error';
 import { CannotCancelPastReservationError } from '@domain/reservation/errors/cannot-cancel-past-reservation.error';
+import { CannotRescheduleCancelledReservationError } from '@domain/reservation/errors/cannot-reschedule-cancelled-reservation.error';
+import { CannotReschedulePastReservationError } from '@domain/reservation/errors/cannot-reschedule-past-reservation.error';
 import { ClientLateCancellationError } from '@domain/reservation/errors/client-late-cancellation.error';
 import { InvalidReservationTimeError } from '@domain/reservation/errors/invalid-reservation-time.error';
 import { ReservationAlreadyCancelledError } from '@domain/reservation/errors/reservation-already-cancelled.error';
@@ -23,6 +25,8 @@ export const errorStatusMap: Record<string, HttpStatus> = {
   [BarberInactiveError.name]: HttpStatus.GONE,
   [BarberNotFoundError.name]: HttpStatus.NOT_FOUND,
   [CannotCancelPastReservationError.name]: HttpStatus.BAD_REQUEST,
+  [CannotRescheduleCancelledReservationError.name]: HttpStatus.CONFLICT,
+  [CannotReschedulePastReservationError.name]: HttpStatus.BAD_REQUEST,
   [ClientLateCancellationError.name]: HttpStatus.BAD_REQUEST,
   [DependencyNotFoundError.name]: HttpStatus.NOT_FOUND,
   [InvalidCredentialsError.name]: HttpStatus.UNAUTHORIZED,

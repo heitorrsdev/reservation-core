@@ -1,4 +1,6 @@
 import { CannotCancelPastReservationError } from './errors/cannot-cancel-past-reservation.error';
+import { CannotRescheduleCancelledReservationError } from './errors/cannot-reschedule-cancelled-reservation.error';
+import { CannotReschedulePastReservationError } from './errors/cannot-reschedule-past-reservation.error';
 import { ClientLateCancellationError } from './errors/client-late-cancellation.error';
 import { InvalidReservationTimeError } from './errors/invalid-reservation-time.error';
 import { ReservationAlreadyCancelledError } from './errors/reservation-already-cancelled.error';
@@ -167,6 +169,126 @@ describe('Reservation Entity', () => {
       activeReservation.cancel(barberId, lateTimeButValidForBarber);
 
       expect(activeReservation.status).toBe('cancelled');
+    });
+  });
+
+  describe('reschedule', () => {
+    const newStartTime = new Date('2024-01-02T14:00:00Z');
+    const newEndTime = new Date('2024-01-02T15:00:00Z');
+
+    let activeReservation: Reservation;
+
+    beforeEach(() => {
+      activeReservation = Reservation.create({
+        userId,
+        barberId,
+        startTime: validStartTime,
+        endTime: validEndTime,
+      });
+    });
+
+    it('should throw CannotRescheduleCancelledReservationError if reservation is cancelled', () => {
+      const validCancelTime = new Date('2024-01-01T08:00:00Z');
+      activeReservation.cancel(userId, validCancelTime);
+
+      expect(() => {
+        activeReservation.reschedule(
+          newStartTime,
+          newEndTime,
+          userId,
+          validCancelTime,
+        );
+      }).toThrow(CannotRescheduleCancelledReservationError);
+    });
+
+    it('should throw UnauthorizedReservationAccessError if actorId is neither client nor barber', () => {
+      const currentTime = new Date('2024-01-01T08:00:00Z');
+
+      expect(() => {
+        activeReservation.reschedule(
+          newStartTime,
+          newEndTime,
+          'stranger-1',
+          currentTime,
+        );
+      }).toThrow(UnauthorizedReservationAccessError);
+    });
+
+    it('should throw CannotReschedulePastReservationError if original startTime is in the past', () => {
+      const pastTime = new Date('2024-01-01T10:30:00Z');
+
+      expect(() => {
+        activeReservation.reschedule(
+          newStartTime,
+          newEndTime,
+          barberId,
+          pastTime,
+        );
+      }).toThrow(CannotReschedulePastReservationError);
+    });
+
+    it('should throw ClientLateCancellationError if client reschedules < 1 hour before startTime', () => {
+      const lateTime = new Date('2024-01-01T09:30:00Z');
+
+      expect(() => {
+        activeReservation.reschedule(
+          newStartTime,
+          newEndTime,
+          userId,
+          lateTime,
+        );
+      }).toThrow(ClientLateCancellationError);
+    });
+
+    it('should throw InvalidReservationTimeError if newEndTime <= newStartTime', () => {
+      const currentTime = new Date('2024-01-01T08:00:00Z');
+
+      expect(() => {
+        activeReservation.reschedule(
+          newStartTime,
+          newStartTime,
+          userId,
+          currentTime,
+        );
+      }).toThrow(InvalidReservationTimeError);
+
+      expect(() => {
+        activeReservation.reschedule(
+          newEndTime,
+          newStartTime,
+          userId,
+          currentTime,
+        );
+      }).toThrow(InvalidReservationTimeError);
+    });
+
+    it('should successfully update startTime and endTime when client reschedules > 1 hour before', () => {
+      const currentTime = new Date('2024-01-01T08:00:00Z');
+
+      activeReservation.reschedule(
+        newStartTime,
+        newEndTime,
+        userId,
+        currentTime,
+      );
+
+      expect(activeReservation.startTime).toBe(newStartTime);
+      expect(activeReservation.endTime).toBe(newEndTime);
+      expect(activeReservation.status).toBe('active');
+    });
+
+    it('should allow barber to reschedule < 1 hour before startTime', () => {
+      const lateTimeButValidForBarber = new Date('2024-01-01T09:30:00Z');
+
+      activeReservation.reschedule(
+        newStartTime,
+        newEndTime,
+        barberId,
+        lateTimeButValidForBarber,
+      );
+
+      expect(activeReservation.startTime).toBe(newStartTime);
+      expect(activeReservation.endTime).toBe(newEndTime);
     });
   });
 });
