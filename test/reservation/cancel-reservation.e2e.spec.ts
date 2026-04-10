@@ -96,7 +96,7 @@ describe('ReservationController (e2e) - DELETE /reservations/:id', () => {
     expect(updated?.status).toBe('cancelled');
   });
 
-  it('should return 400 when client attempts to cancel 30 minutes before', async () => {
+  it('should return 422 when client attempts to cancel 30 minutes before', async () => {
     const user = await persistUser(testDb);
     const barberUser = await persistUser(testDb);
     const barber = await persistBarber(testDb, { id: barberUser.id });
@@ -117,7 +117,7 @@ describe('ReservationController (e2e) - DELETE /reservations/:id', () => {
     await request(httpServer)
       .delete(`/reservations/${reservation.id}`)
       .set('Authorization', `Bearer ${token}`)
-      .expect(400);
+      .expect(422);
   });
 
   it('should allow the provider barber to cancel 30 minutes before', async () => {
@@ -147,7 +147,7 @@ describe('ReservationController (e2e) - DELETE /reservations/:id', () => {
     expect(updated?.status).toBe('cancelled');
   });
 
-  it('should return 400 when barber attempts to cancel 5 minutes after start', async () => {
+  it('should return 422 when barber attempts to cancel 5 minutes after start', async () => {
     const user = await persistUser(testDb);
     const barberUser = await persistUser(testDb);
     const barber = await persistBarber(testDb, { id: barberUser.id });
@@ -168,7 +168,7 @@ describe('ReservationController (e2e) - DELETE /reservations/:id', () => {
     await request(httpServer)
       .delete(`/reservations/${reservation.id}`)
       .set('Authorization', `Bearer ${token}`)
-      .expect(400);
+      .expect(422);
   });
 
   it('should return 403 when a third-party user attempts to cancel', async () => {

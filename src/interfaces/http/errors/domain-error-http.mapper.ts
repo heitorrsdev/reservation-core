@@ -24,10 +24,10 @@ import { HttpStatus } from '@nestjs/common';
 export const errorStatusMap: Record<string, HttpStatus> = {
   [BarberInactiveError.name]: HttpStatus.GONE,
   [BarberNotFoundError.name]: HttpStatus.NOT_FOUND,
-  [CannotCancelPastReservationError.name]: HttpStatus.BAD_REQUEST,
+  [CannotCancelPastReservationError.name]: HttpStatus.UNPROCESSABLE_ENTITY,
   [CannotRescheduleCancelledReservationError.name]: HttpStatus.CONFLICT,
-  [CannotReschedulePastReservationError.name]: HttpStatus.BAD_REQUEST,
-  [ClientLateCancellationError.name]: HttpStatus.BAD_REQUEST,
+  [CannotReschedulePastReservationError.name]: HttpStatus.UNPROCESSABLE_ENTITY,
+  [ClientLateCancellationError.name]: HttpStatus.UNPROCESSABLE_ENTITY,
   [DependencyNotFoundError.name]: HttpStatus.NOT_FOUND,
   [InvalidCredentialsError.name]: HttpStatus.UNAUTHORIZED,
   [InvalidRefreshTokenError.name]: HttpStatus.UNAUTHORIZED,
