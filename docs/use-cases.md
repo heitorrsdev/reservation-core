@@ -130,3 +130,62 @@ It describes the expected business rules that impact schema, queries, and valida
 ### Observations
 
 * Dates and times are handled in UTC
+
+---
+
+## UC-06 — List All Barbers
+
+**Actor:** Client (or Public)
+
+### Primary Flow
+
+1. System queries all active barbers
+2. Returns the list of barbers with their public profile data
+
+### Business Rules
+
+* Response must **not expose sensitive user data** (e.g., password hashes)
+* Reflects the architectural decision that Barber is a **specialization of User** (see ADR-0007)
+* Only active barbers are included in the result
+
+---
+
+## UC-07 — Get Reservation by ID
+
+**Actor:** Client or Barber
+
+### Primary Flow
+
+1. System receives a reservation ID and the actor's ID
+2. System verifies if the reservation exists
+3. System validates authorization:
+   * Client can only view **their own** reservation
+   * Barber can only view reservations **assigned to them**
+4. Returns the reservation details
+
+### Business Rules
+
+* **IDOR protection** must be enforced — actors cannot access reservations they do not own
+* Unauthorized access results in an authorization error, not a not-found error (to avoid information leakage)
+
+---
+
+## UC-08 — User Authentication (Login)
+
+**Actor:** User
+
+### Primary Flow
+
+1. System receives credentials (email and password)
+2. System looks up the user by email
+3. System verifies the provided password against the stored Argon2 hash
+4. On success, system issues an **Access Token** and a **Refresh Token**
+5. Refresh token hash is persisted in the database
+
+### Business Rules
+
+* Passwords are **verified via Argon2** — never compared in plain text
+* Access tokens are **stateless JWTs** with a short expiration (see ADR-0013)
+* Refresh tokens are **stateful** and stored as a hash in the database (see ADR-0014)
+* Refresh tokens must **never be persisted in plain text**
+* Invalid credentials result in a generic authentication error (no distinction between wrong email and wrong password)
