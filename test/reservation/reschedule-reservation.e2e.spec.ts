@@ -142,7 +142,7 @@ describe('ReservationController (e2e) - PATCH /reservations/:id', () => {
       .expect(409);
   });
 
-  it('should return 400 when client tries to reschedule < 1 hour before', async () => {
+  it('should return 422 when client tries to reschedule < 1 hour before', async () => {
     const user = await persistUser(testDb);
     const barberUser = await persistUser(testDb);
     const barber = await persistBarber(testDb, { id: barberUser.id });
@@ -167,7 +167,7 @@ describe('ReservationController (e2e) - PATCH /reservations/:id', () => {
         newStartTime: '2026-05-02T14:00:00Z',
         newEndTime: '2026-05-02T15:00:00Z',
       })
-      .expect(400);
+      .expect(422);
   });
 
   it('should return 403 when a third-party user attempts to reschedule', async () => {
