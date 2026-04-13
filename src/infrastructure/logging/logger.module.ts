@@ -11,6 +11,7 @@ import { LoggerModule } from 'nestjs-pino';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         const isProduction = config.get('NODE_ENV') === 'production';
+        const isTest = config.get('NODE_ENV') === 'test';
 
         return {
           pinoHttp: {
@@ -33,17 +34,18 @@ import { LoggerModule } from 'nestjs-pino';
               ],
               censor: '***',
             },
-            // Pretty Print ONLY when not in production
-            transport: !isProduction
-              ? {
-                  target: 'pino-pretty',
-                  options: {
-                    singleLine: true,
-                    colorize: true,
-                  },
-                }
-              : undefined,
-            // JSON format is default in pino for production
+            // Pretty Print ONLY when not in production and NOT in test
+            transport:
+              !isProduction && !isTest
+                ? {
+                    target: 'pino-pretty',
+                    options: {
+                      singleLine: true,
+                      colorize: true,
+                    },
+                  }
+                : undefined,
+            // JSON format is default in pino for production and tests
           },
         };
       },

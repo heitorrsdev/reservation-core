@@ -11,6 +11,7 @@ const config: Config = {
   },
   preset: 'ts-jest',
   testEnvironment: 'node',
+  setupFilesAfterEnv: ['<rootDir>/test/setup-after-env.ts'],
 };
 
 export default config;
