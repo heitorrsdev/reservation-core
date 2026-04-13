@@ -6,15 +6,15 @@ import {
   ExceptionFilter,
   HttpException,
   HttpStatus,
-  Logger,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { Logger } from 'nestjs-pino';
 
 import { DomainErrorHttpMapper } from '../errors/domain-error-http.mapper';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
-  private readonly logger = new Logger(GlobalExceptionFilter.name);
+  constructor(private readonly logger: Logger) {}
 
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
