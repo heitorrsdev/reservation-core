@@ -15,11 +15,9 @@ import { LoggerModule } from 'nestjs-pino';
 
         return {
           pinoHttp: {
-            // Correlation ID: Ensure each request gets a unique ID
             genReqId: (req: IncomingMessage) => {
               return req.headers['x-correlation-id'] || randomUUID();
             },
-            // PII Masking: auto mask sensitive fields
             redact: {
               paths: [
                 'req.headers.authorization',
@@ -34,7 +32,6 @@ import { LoggerModule } from 'nestjs-pino';
               ],
               censor: '***',
             },
-            // Pretty Print ONLY when not in production and NOT in test
             transport:
               !isProduction && !isTest
                 ? {
@@ -45,7 +42,6 @@ import { LoggerModule } from 'nestjs-pino';
                     },
                   }
                 : undefined,
-            // JSON format is default in pino for production and tests
           },
         };
       },
