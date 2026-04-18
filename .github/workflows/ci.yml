@@ -42,4 +42,4 @@ jobs:
         run: pnpm build
 
       - name: Integration Tests
-        run: task ci-test
+        run: task test
