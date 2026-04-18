@@ -1,0 +1,17 @@
+node_modules
+dist
+.git
+.github
+coverage
+
+docker
+docs
+test
+
+.env*
+tools
+jest.config.ts
+Taskfile.yml
+
+*.md
+!README.md

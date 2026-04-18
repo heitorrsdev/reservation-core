@@ -1,13 +1,45 @@
 services:
+
   postgres:
     image: postgres:16
-    container_name: reservation-prod-postgres
+    restart: unless-stopped
     environment:
       POSTGRES_DB: reservation_db
       POSTGRES_USER: reservation_app
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
     volumes:
       - postgres_prod_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U reservation_app -d reservation_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  migrate:
+    image: reservation-api
+    container_name: reservation-prod-migrate
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://reservation_app:${DATABASE_PASSWORD}@postgres:5432/reservation_db
+    command: ["node", "dist/tools/migrate.js"]
+    restart: "no"
+
+  api:
+    image: reservation-api
+    container_name: reservation-prod-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://reservation_app:${DATABASE_PASSWORD}@postgres:5432/reservation_db
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
 
 volumes:
   postgres_prod_data:

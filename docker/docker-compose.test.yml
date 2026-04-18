@@ -1,7 +1,6 @@
 services:
   postgres_test:
     image: postgres:16
-    container_name: barber_test_db
     restart: no
     environment:
       POSTGRES_DB: barber_test
