@@ -33,13 +33,13 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Lint
-        run: task lint
+        run: pnpm lint
 
       - name: Typecheck
-        run: task typecheck
+        run: pnpm typecheck
 
       - name: Build
         run: pnpm build
 
       - name: Integration Tests
-        run: task ci-test
+        run: task test

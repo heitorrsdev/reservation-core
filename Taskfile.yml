@@ -4,9 +4,6 @@ dotenv:
   - .env.{{.ENV | default "test"}}
 
 vars:
-  DEV_COMPOSE: docker/docker-compose.dev.yml
-  PROD_COMPOSE: docker/docker-compose.prod.yml
-  TEST_COMPOSE: docker/docker-compose.test.yml
   TREE_IGNORE: node_modules|.git|dist|*.env*
   NODE_VERSION:
     sh: cat .node-version
@@ -17,150 +14,75 @@ env:
 tasks:
 
   # ─────────────────────────────────────────────
-  # Environment
+  # Core helpers
   # ─────────────────────────────────────────────
 
+  compose:
+    desc: Run docker compose for an environment
+    cmds:
+      - docker compose --env-file .env.{{.ENV}} -f docker/docker-compose.{{.ENV}}.yml {{.CMD}}
+
   check-env:
-    dotenv:
-      - .env.{{.ENV | default "test"}}
+    desc: Ensure required env vars exist
     cmds:
       - |
         if [ -z "$DATABASE_URL" ]; then
-          echo "❌ DATABASE_URL not defined in .env.{{.ENV | default "test"}}"
+          echo "❌ DATABASE_URL missing in .env.{{.ENV}}"
           exit 1
         fi
 
   migrate:
     deps: [check-env]
-    dotenv:
-      - .env.{{.ENV | default "test"}}
     cmds:
       - pnpm migrate
 
   # ─────────────────────────────────────────────
-  # Helpers
+  # Docker environments
   # ─────────────────────────────────────────────
 
-  compose:
-    dotenv:
-      - .env.{{.ENV | default "test"}}
+  up:
+    desc: Start environment containers
     cmds:
-      - docker compose -f {{.FILE}} {{.CMD}}
+      - task compose ENV={{.ENV | default "test"}} CMD="up -d {{.ARGS}}"
 
-  # ─────────────────────────────────────────────
-  # Quality
-  # ─────────────────────────────────────────────
-
-  lint:
+  down:
+    desc: Stop environment containers
     cmds:
-      - pnpm lint
+      - task compose ENV={{.ENV | default "test"}} CMD="down {{.ARGS}}"
 
-  typecheck:
+  stop:
+    desc: Stop containers without removing
     cmds:
-      - pnpm tsc --noEmit
+      - task compose ENV={{.ENV | default "test"}} CMD="stop"
+
+  start:
+    desc: Start existing containers
+    cmds:
+      - task compose ENV={{.ENV | default "test"}} CMD="start"
+
+  reset:
+    desc: Reset environment (remove volumes)
+    cmds:
+      - task compose ENV={{.ENV | default "test"}} CMD="down -v"
 
   # ─────────────────────────────────────────────
-  # CI
+  # Testing
   # ─────────────────────────────────────────────
 
-  ci-test:
-    vars:
-      ENV: test
-    dotenv:
-      - .env.test
+  test:
+    desc: Run test suite
     cmds:
-      - task test-reset
-      - task test-up
-      - task migrate
+      - task reset ENV=test
+      - task up ENV=test ARGS="--wait"
+      - task migrate ENV=test
       - |
-        pnpm jest || (task test-down && exit 1)
-      - task test-down
+        pnpm jest || (task down ENV=test && exit 1)
+      - task down ENV=test
 
   test-watch:
-    vars:
-      ENV: test
-    dotenv:
-      - .env.test
+    desc: Run tests in watch mode
     cmds:
       - pnpm jest {{.FILES}} --runInBand
-
-  # ─────────────────────────────────────────────
-  # DEV
-  # ─────────────────────────────────────────────
-
-  dev-up:
-    vars:
-      ENV: dev
-    cmds:
-      - echo "🚧 Starting DEV Postgres"
-      - task compose FILE={{.DEV_COMPOSE}} CMD="up -d"
-
-  dev-stop:
-    vars:
-      ENV: dev
-    cmds:
-      - echo "⏹️ Stopping DEV containers"
-      - task compose FILE={{.DEV_COMPOSE}} CMD="stop"
-
-  dev-start:
-    vars:
-      ENV: dev
-    cmds:
-      - echo "▶️ Starting DEV containers"
-      - task compose FILE={{.DEV_COMPOSE}} CMD="start"
-
-  dev-down:
-    vars:
-      ENV: dev
-    cmds:
-      - echo "⬇️ Removing DEV containers (keeping volumes)"
-      - task compose FILE={{.DEV_COMPOSE}} CMD="down"
-
-  dev-reset:
-    vars:
-      ENV: dev
-    cmds:
-      - echo "💥 Resetting DEV environment (containers + volumes)"
-      - task compose FILE={{.DEV_COMPOSE}} CMD="down -v"
-
-
-  # ─────────────────────────────────────────────
-  # PROD
-  # ─────────────────────────────────────────────
-
-  prod-up:
-    vars:
-      ENV: prod
-    cmds:
-      - echo "🚀 Starting PROD Postgres"
-      - task compose FILE={{.PROD_COMPOSE}} CMD="up -d"
-
-
-  # ─────────────────────────────────────────────
-  # TEST
-  # ─────────────────────────────────────────────
-
-  test-up:
-    vars:
-      ENV: test
-    cmds:
-      - echo "🧪 Starting TEST Postgres"
-      - task compose FILE={{.TEST_COMPOSE}} CMD="up -d --wait"
-
-  test-down:
-    vars:
-      ENV: test
-    cmds:
-      - echo "⬇️ Removing TEST containers (keeping volumes)"
-      - task compose FILE={{.TEST_COMPOSE}} CMD="down"
-
-  test-reset:
-    vars:
-      ENV: test
-    cmds:
-      - echo "💥 Resetting TEST environment (containers + volumes)"
-      - task compose FILE={{.TEST_COMPOSE}} CMD="down -v"
-
 
   # ─────────────────────────────────────────────
   # Utils
