@@ -38,5 +38,8 @@ jobs:
       - name: Typecheck
         run: task typecheck
 
+      - name: Build
+        run: pnpm build
+
       - name: Integration Tests
         run: task ci-test
