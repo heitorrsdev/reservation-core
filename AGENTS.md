@@ -227,7 +227,87 @@ Never mix environments.
 
 ---
 
-# 8. Environment Configuration
+## 8. Commit & PR Rules
+
+**Commit format:**
+
+```
+type: short description
+```
+
+Allowed types: `feat`, `fix`, `refactor`, `test`, `docs`, `style`, `chore`
+
+Commit messages must be imperative, concise, and focused on a single change.
+
+Commits must be atomic: each commit should represent a single, self-contained change that leaves the codebase in a working state.
+Never batch unrelated changes in a single commit.
+Prefer multiple small commits over one large commit per task.
+
+`chore` applies to: tooling changes, configuration updates, dependency management, and developer experience (DX) improvements that do not affect application logic.
+
+Examples:
+- chore: add @src path alias
+- chore: harden eslint config
+- chore: update tsconfig paths
+
+
+**Branch naming:**
+
+```
+feat/feature-name
+fix/bug-description
+refactor/refactor-description
+test/test-description
+docs/doc-description
+chore/short-description
+```
+
+Never append generated IDs, timestamps, hashes, or any automatic suffix to branch names.
+Branch names must always follow exactly: type/short-description
+
+Correct: refactor/domain-entity-created-at
+
+Wrong: refactor/domain-entity-created-at-12618706006155161774
+
+**PR rules:**
+
+PRs must be small and focused. Never mix refactors with features.
+
+PR description structure:
+
+```markdown
+## Description
+One paragraph summarizing the change.
+
+## What was done
+- Bullet list of concrete changes made
+
+## Why
+Explanation of motivation and architectural reasoning.
+Why this approach was chosen and what it enables going forward.
+```
+
+**Git workflow:**
+
+The agent must always follow these steps before starting any work:
+
+1. Switch to main: `git switch main`
+2. Fetch remote changes: `git fetch origin`
+3. Pull latest: `git pull origin main`
+4. Create and switch to the new branch from the updated main
+
+After completing any task:
+1. Run `task test` and confirm all tests pass. If any test fails, fix it before proceeding.
+2. Stop and summarize what was done
+3. List all files modified
+4. Ask for explicit approval before proceeding to open a PR
+5. Only open the PR after receiving confirmation
+
+Never open a PR autonomously. Always wait for human review and approval first.
+
+---
+
+# 9. Environment Configuration
 
 Environment variables are managed via **Taskfile dotenv integration**.
 
@@ -255,7 +335,7 @@ loads:
 
 ---
 
-# 9. Testing
+# 10. Testing
 
 Testing framework: **Jest**
 
@@ -285,7 +365,7 @@ Reservation creation is heavily validated under concurrent scenarios.
 
 ---
 
-# 10. Architecture Decision Records (ADR)
+# 11. Architecture Decision Records (ADR)
 
 Located in:
 
@@ -315,7 +395,7 @@ If a proposal contradicts an ADR, **stop and request clarification**.
 
 ---
 
-# 11. Domain Glossary
+# 12. Domain Glossary
 
 | Term                 | Meaning                                            |
 | -------------------- | -------------------------------------------------- |
@@ -329,7 +409,7 @@ If a proposal contradicts an ADR, **stop and request clarification**.
 
 ---
 
-# 12. Hard Rules
+# 13. Hard Rules
 
 ### Entity factories
 
