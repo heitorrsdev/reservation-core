@@ -3,6 +3,16 @@ import { ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 
+function parseAllowedOrigins(allowedOrigins?: string): boolean | string[] {
+  if (!allowedOrigins) {
+    return false;
+  }
+  if (allowedOrigins === 'true' || allowedOrigins === '*') {
+    return true;
+  }
+  return allowedOrigins.split(',').map((o) => o.trim());
+}
+
 export function configureApp(app: INestApplication) {
   app.enableShutdownHooks();
 
@@ -15,8 +25,7 @@ export function configureApp(app: INestApplication) {
 
   app.use(cookieParser());
   app.enableCors({
-    origin:
-      process.env.ALLOWED_ORIGINS?.split(',').map((o) => o.trim()) || false,
+    origin: parseAllowedOrigins(process.env.ALLOWED_ORIGINS),
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
