@@ -2,121 +2,232 @@
 
 ## 1. Project Overview
 
-This project is a backend service for a **barbershop reservation system** built with strong architectural discipline.
-The goal is to implement a maintainable and scalable backend using **clean layered architecture**, prioritizing domain modeling and long-term maintainability over rapid feature development.
+This project is a backend service for a **barbershop reservation system** designed with strong architectural discipline.
 
-The system manages:
+The primary goal is **long-term maintainability and correctness**, not rapid prototyping.
+The architecture follows **strict layered separation** and **domain-driven modeling**.
 
-* Users
-* Barbers (a specialization of users)
-* Reservations between users and barbers
+The system currently supports:
 
-At the current stage the project already contains **domain logic, application use cases, database infrastructure, and integration tests**. The **HTTP layer is being implemented** as the external interface.
+* User registration
+* Authentication using **JWT access tokens and refresh tokens**
+* Barber management (modeled as a specialization of users)
+* Reservation scheduling between users and barbers
+* Reservation lifecycle management (create, cancel, reschedule)
+* Reservation conflict prevention and concurrency protection
 
----
+The project already includes:
 
-## 2. Tech Stack
+* Fully implemented **domain layer**
+* Application **use cases**
+* Database **repositories**
+* **HTTP interface**
+* **Authentication system**
+* **Integration and concurrency tests**
 
-| Concern | Tool |
-|---|---|
-| Language | TypeScript |
-| Runtime | Node.js 20 |
-| Framework | NestJS |
-| Database | PostgreSQL |
-| ORM / Query Builder | Drizzle ORM (query builder and mapping layer, not schema authority) |
-| Migrations | SQL-first manual migrations |
-| Password & Token hashing | argon2 |
-| Testing | Jest |
-| Package manager | pnpm 9 |
-| Containerization | Docker |
-| Linting | ESLint |
-| Formatting | Prettier |
-| Task runner | Taskfile (task) |
-
-Testing approach emphasizes **integration tests and concurrency validation** rather than heavy mocking.
+The system prioritizes **correct domain invariants**, **transaction safety**, and **explicit architecture boundaries**.
 
 ---
 
-## 3. Project Structure
+# 2. Tech Stack
+
+| Concern                 | Tool                          |
+| ----------------------- | ----------------------------- |
+| Language                | TypeScript                    |
+| Runtime                 | Node.js                       |
+| Framework               | NestJS                        |
+| Database                | PostgreSQL                    |
+| Query Builder / Mapping | Drizzle ORM                   |
+| Migrations              | SQL-first manual migrations   |
+| Authentication          | JWT (stateless access tokens) |
+| Password hashing        | argon2                        |
+| Refresh token hashing   | argon2                        |
+| Logging                 | Pino                          |
+| Testing                 | Jest                          |
+| Package manager         | pnpm                          |
+| Containerization        | Docker                        |
+| Task runner             | go-task                       |
+
+Important design principle:
+
+**The database schema is authoritative and defined via SQL migrations, not via ORM models.**
+
+---
+
+# 3. Project Structure
 
 ```
 src/
-  domain/           # Pure business logic. Entities, value objects, domain errors, repository interfaces. No framework dependencies allowed.
-  application/      # Use cases and orchestration. Commands, repository tokens for DI.
-  infrastructure/   # Drizzle repositories, database provider, PostgreSQL, argon2, migration runner, schema definitions.
-  interfaces/http/  # Controllers, DTOs, validation, exception filters, domain-to-HTTP error mapping.
+  domain/           # Pure business logic
+  application/      # Use cases and orchestration
+  infrastructure/   # Database, repositories, auth, logging
+  interfaces/http/  # Controllers, DTOs, filters, decorators
 
-migrations/         # Versioned SQL migrations. All schema changes go here.
+migrations/         # Versioned SQL migrations
+
 docs/
-  adr/              # Architecture Decision Records (ADRs 0001–0010). Consult before proposing structural changes.
+  adr/              # Architecture Decision Records
   testing.md
   use-cases.md
-test/               # Integration tests, concurrency tests, test utilities, and factories.
-docker/             # docker-compose.dev.yml, docker-compose.prod.yml, docker-compose.test.yml
+
+test/
+  e2e tests
+  integration tests
+  concurrency tests
+  test utilities
+  factories
+
+docker/
+  docker-compose.dev.yml
+  docker-compose.prod.yml
+  docker-compose.test.yml
 ```
 
 ---
 
-## 4. Code Conventions
+# 4. Layer Responsibilities
 
-Favor **explicit, readable code over abstraction**. Avoid premature generalization.
+### Domain
 
-| Element | Convention | Example |
-|---|---|---|
-| Entities | PascalCase | `User`, `Reservation` |
-| Use cases | Verb-based | `CreateUserUseCase` |
-| Commands | Verb + domain object | `CreateReservationCommand` |
-| Repository interface | Domain name | `UserRepository` |
-| Repository impl | Name + Drizzle | `UserDrizzleRepository` |
-| DTOs | Suffix with DTO | `CreateUserDTO` |
-| Files | kebab-case | `create-user.usecase.ts` |
-| Errors | Explicit error classes | `UserAlreadyExistsError` |
+Pure business logic.
+
+Contains:
+
+* Entities
+* Value Objects
+* Domain Errors
+* Repository Interfaces
+
+Restrictions:
+
+* No framework imports
+* No database code
+* No HTTP code
+
+---
+
+### Application
+
+Coordinates domain logic.
+
+Contains:
+
+* Use cases
+* Commands
+* Repository tokens for DI
+* Service interfaces (token generator, password hasher)
+
+Application layer **does not know infrastructure implementations**.
+
+---
+
+### Infrastructure
+
+Implements interfaces defined by domain/application.
+
+Contains:
+
+* Drizzle repositories
+* PostgreSQL integration
+* JWT authentication
+* Password hashing (argon2)
+* Refresh token persistence
+* Logging (Pino)
+
+Infrastructure must **never leak into domain**.
+
+---
+
+### Interfaces (HTTP)
+
+External interface.
+
+Contains:
+
+* Controllers
+* DTOs
+* Validation
+* Exception filters
+* HTTP ↔ Domain error mapping
+* Authentication decorators
+
+Controllers call **use cases only**.
+
+---
+
+# 5. Code Conventions
+
+Favor **explicitness over abstraction**.
+
+| Element                   | Convention                    |
+| ------------------------- | ----------------------------- |
+| Entities                  | PascalCase                    |
+| Use cases                 | VerbBasedUseCase              |
+| Commands                  | VerbDomainObjectCommand       |
+| Repository interface      | DomainNameRepository          |
+| Repository implementation | NameDrizzleRepository         |
+| DTOs                      | `*.dto.ts`                    |
+| Files                     | kebab-case                    |
+| Errors                    | Explicit domain error classes |
 
 Avoid:
 
-* Generic utility abstractions
-* Shared base classes for controllers
-* Leaking infrastructure logic into domain or application layers
+* Generic repositories
+* Base controllers
+* Premature abstractions
+* Cross-layer shortcuts
 
 ---
 
-## 5. Task Runner
+# 6. Task Runner
 
-All operations must be run via `go-task`, never by invoking scripts or docker compose directly.
+All project operations must be executed through **Taskfile tasks**.
 
-| Task | Purpose |
-|---|---|
-| `task dev-up` | Start DEV Postgres container |
-| `task dev-stop` | Stop DEV containers |
-| `task dev-down` | Remove DEV containers (keep volumes) |
-| `task dev-reset` | Remove DEV containers and volumes |
-| `task test-up` | Start TEST Postgres container (waits for healthy) |
-| `task test-down` | Remove TEST containers |
-| `task test-reset` | Remove TEST containers and volumes |
-| `task migrate` | Run SQL migrations (requires DATABASE_URL) |
-| `task lint` | Run ESLint |
-| `task typecheck` | Run TypeScript type check (no emit) |
-| `task ci-test` | Full CI test run: reset → up → migrate → jest → down |
+Never call `docker compose` directly.
 
-Never invoke `docker compose` directly. Always use the Taskfile.
+Key tasks:
 
----
+| Task                                   | Purpose                       |
+| -------------------------------------- | ----------------------------- |
+| `task up ENV=dev`                      | Start development environment |
+| `task down ENV=dev`                    | Stop development environment  |
+| `task reset ENV=dev`                   | Reset development DB          |
+| `task up`                              | Start test DB                 |
+| `task migrate`                         | Run migrations                |
+| `task test`                            | Full isolated test run        |
+| `task test-watch FILES="file.spec.ts"` | Run specific tests            |
 
-## 6. Docker
+Testing pipeline:
 
-Three isolated environments with separate compose files:
+```
+task test
+```
 
-| Environment | File | Purpose |
-|---|---|---|
-| dev | `docker/docker-compose.dev.yml` | Local development |
-| prod | `docker/docker-compose.prod.yml` | Production |
-| test | `docker/docker-compose.test.yml` | Integration/CI tests |
+This runs:
 
-Never mix environments. Never use the dev or prod compose for tests.
+```
+reset → up → migrate → jest → down
+```
 
 ---
 
-## 7. Commit & PR Rules
+# 7. Docker Environments
+
+Three isolated environments:
+
+| Environment | File                    |
+| ----------- | ----------------------- |
+| dev         | docker-compose.dev.yml  |
+| prod        | docker-compose.prod.yml |
+| test        | docker-compose.test.yml |
+
+Each environment has its own database.
+
+Never mix environments.
+
+---
+
+## 8. Commit & PR Rules
 
 **Commit format:**
 
@@ -153,7 +264,9 @@ chore/short-description
 
 Never append generated IDs, timestamps, hashes, or any automatic suffix to branch names.
 Branch names must always follow exactly: type/short-description
+
 Correct: refactor/domain-entity-created-at
+
 Wrong: refactor/domain-entity-created-at-12618706006155161774
 
 **PR rules:**
@@ -184,7 +297,7 @@ The agent must always follow these steps before starting any work:
 4. Create and switch to the new branch from the updated main
 
 After completing any task:
-1. Run `task ci-test` and confirm all tests pass. If any test fails, fix it before proceeding.
+1. Run `task test` and confirm all tests pass. If any test fails, fix it before proceeding.
 2. Stop and summarize what was done
 3. List all files modified
 4. Ask for explicit approval before proceeding to open a PR
@@ -194,158 +307,219 @@ Never open a PR autonomously. Always wait for human review and approval first.
 
 ---
 
-## 8. CI Pipeline
+# 9. Environment Configuration
 
-CI runs on all PRs and on pushes to `main`.
+Environment variables are managed via **Taskfile dotenv integration**.
 
-Pipeline steps (via GitHub Actions):
+Files:
 
-1. `pnpm install --frozen-lockfile`
-2. `task lint`
-3. `task typecheck`
-4. `task ci-test` (reset → up → migrate → jest → down)
+| File        | Purpose             | Versioned |
+| ----------- | ------------------- | --------- |
+| `.env.dev`  | Local development   | Yes       |
+| `.env.test` | Testing environment | Yes       |
+| `.env.prod` | Production secrets  | No        |
 
-`DATABASE_URL` is injected from `secrets.TEST_DATABASE_URL`.
+Tasks automatically load the correct file.
 
-A PR must pass all CI steps before merging. Never open a PR that is known to break lint, typecheck, or tests.
+Example:
 
-When running in a containerless environment (such as Jules), `task ci-test` will fail due to Docker Hub pull rate limits or lack of container access. In this case, run `task typecheck` and `pnpm build` as a fallback. The human reviewer is responsible for running `task ci-test` locally before approving the PR.
+```
+task up ENV=dev
+```
+
+loads:
+
+```
+.env.dev
+```
 
 ---
 
-## 9. Testing
+# 10. Testing
 
-Testing framework: Jest
+Testing framework: **Jest**
 
-Test types: integration tests, concurrency tests.
+Test types:
 
-Tests are located in `test/`. Structure example:
+* End-to-end tests
+* Integration tests
+* Concurrency tests
+
+Structure:
 
 ```
-test/reservation/reservation-concurrency.int.spec.ts
-test/user/create-user.e2e.spec.ts
+test/
+  auth/
+  barber/
+  reservation/
+  user/
+  factories/
+  utils/
 ```
 
-Utilities include: test database setup, truncation helpers, concurrency barrier, and factories.
+Factories generate valid domain objects.
 
-Factories generate valid domain objects for tests.
+Concurrency-sensitive flows must always have tests.
 
-Tests must prioritize **behavioral verification and business invariants**, not implementation details.
-
-| Command | Purpose |
-|---|---|
-| `pnpm test` | Run all tests |
-| `pnpm test <file>` | Run a specific test file |
-| `task ci-test` | Full CI-grade test run with isolated DB |
-| `task test-watch` | Run one or more specific test files against the existing test database. Requires test-up and migrate to have been run first. Accepts multiple files via FILES='file1 file2'. |
-
-Note: prefer `task test-watch` over `task ci-test` when iterating on a specific test during development. Use `task ci-test` only for full verification before opening a PR.
-
-Critical domain flows must have integration coverage. Concurrency-sensitive logic (reservations) must always be tested.
+Reservation creation is heavily validated under concurrent scenarios.
 
 ---
 
-## 10. Architecture Decision Records (ADRs)
+# 11. Architecture Decision Records (ADR)
 
-ADRs are located in `docs/adr/` and document all major technical decisions:
+Located in:
 
-|   ID | Topic                                |
-| ---: | ------------------------------------ |
-| 0001 | Layered Architecture                 |
-| 0002 | Architecture Enforcement via Tooling |
-| 0003 | PostgreSQL-First Database Strategy   |
-| 0004 | SQL-First Migrations                 |
-| 0005 | Drizzle Over Prisma                  |
-| 0006 | SQL-First Migration Runner           |
-| 0007 | Barber as Specialized User           |
-| 0008 | Drizzle Schema in Database Provider  |
-| 0009 | Postgres Error Mapper                |
-| 0010 | UUID as Identifier Type              |
-| 0011 | Application-Controlled Timestamps    |
-| 0012 | Entity Factory Method Separation     |
-| 0013 | Stateless JWT Authentication         |
-| 0014 | Refresh Token Strategy               |
+```
+docs/adr/
+```
 
-**Before proposing any structural change, consult the relevant ADR.** If a decision contradicts an existing ADR, flag it explicitly and do not proceed without confirmation.
+These documents define the **architectural rules of the system**.
+
+Key decisions include:
+
+| ID   | Decision                          |
+| ---- | --------------------------------- |
+| 0001 | Layered architecture              |
+| 0003 | PostgreSQL-first strategy         |
+| 0004 | SQL-first migrations              |
+| 0005 | Drizzle over Prisma               |
+| 0010 | UUID identifiers                  |
+| 0011 | Application-controlled timestamps |
+| 0013 | Stateless JWT authentication      |
+| 0014 | Refresh token strategy            |
+| 0015 | Structured logging with Pino      |
+
+Before proposing structural changes, consult ADRs.
+
+If a proposal contradicts an ADR, **stop and request clarification**.
 
 ---
 
-## 11. Domain Glossary
+# 12. Domain Glossary
 
-| Term | Definition |
-|---|---|
-| User | A system user capable of creating reservations |
-| Barber | A specialization of a user who can receive reservations. Modeled as relational specialization, not a role enum |
-| Reservation | A scheduled appointment between a user and a barber |
-| Reservation Conflict | Occurs when a reservation overlaps an existing reservation for the same barber |
-| Invalid Reservation Time | Occurs when reservation start/end times violate domain rules |
-| CreatedAt | Timestamp generated by the application layer, not the database |
-| Repository | Interface used by the application layer to interact with persistence |
-| Access Token | Stateless JWT with a short expiration, used to securely identify the user within the system. |
-| Refresh Token | Stateful, database-persisted token mapped to a user, used to securely renew the Access Token. |
+| Term                 | Meaning                                            |
+| -------------------- | -------------------------------------------------- |
+| User                 | System user who creates reservations               |
+| Barber               | Specialized user capable of receiving reservations |
+| Reservation          | Appointment between user and barber                |
+| Reservation Conflict | Overlapping reservations for same barber           |
+| Access Token         | Short-lived JWT used for authentication            |
+| Refresh Token        | Stateful token used to renew access tokens         |
+| Repository           | Persistence interface used by application layer    |
 
 ---
 
-## 12. Hard Rules
+# 13. Hard Rules
 
-Entities must have two separate static factory methods:
-- `create()` — for new entity creation. Never accepts `createdAt` as input. Always sets `createdAt: new Date()` internally.
-- `reconstitute()` — exclusively for infrastructure mappers rebuilding entities from database rows. Accepts all fields including `createdAt` and `active` state.
+### Entity factories
 
-Never call `create()` from mappers. Never call `reconstitute()` from use cases or application layer.
-
-All routes must require authentication by default (globally protected by `JwtAuthGuard`). Endpoints that legitimately bypass this restriction must be explicitly marked with the `@Public()` decorator.
-
-Refresh tokens must never be persisted in plain text. Always persist the token hash (using argon2) in the database.
-
-Never place framework code inside the domain layer. Domain must never depend on NestJS, Drizzle, PostgreSQL, HTTP, or DTOs.
-
-Controllers must never access repositories directly. Controllers must call **application use cases only**.
-
-Never modify the database schema without creating a **new migration**. Do not use automatic ORM schema generation.
-
-Do not duplicate SQL error handling logic. All PostgreSQL error interpretation must go through **PostgresErrorMapper**.
-
-Do not introduce generic repositories or query abstractions prematurely.
-
-Do not introduce base controller classes or unnecessary architectural layers.
-
-Do not bypass domain entities when creating business objects.
-
-Do not log using `console.log` in production code.
-
-Avoid premature optimization and speculative abstractions.
-
-**Dependency flow must always be:**
+Entities must expose two factory methods:
 
 ```
-interfaces/http → application → domain
-
-infrastructure implements domain interfaces (e.g. repositories)
-but is never imported by domain or application directly.
+create()
+reconstitute()
 ```
 
-Never invert this dependency direction.
+Rules:
 
-Never create a branch from a stale or non-main base unless explicitly instructed otherwise.
+* `create()`
+  Used when creating new entities
+  Must internally generate `createdAt`.
 
-## 13. Environment Configuration
+* `reconstitute()`
+  Used by infrastructure mappers when rebuilding entities from database rows.
 
-The project uses environment-specific `.env` files managed by `task`.
+Never mix their usage.
 
-| File | Purpose | Versioned? |
-|---|---|---|
-| `.env.dev` | Local development variables | Yes |
-| `.env.test` | Test environment variables (Default) | Yes |
-| `.env.prod` | Production credentials/secrets | **No** |
+---
 
-**How it works:**
-- Tasks use `go-task` native `dotenv` support: `dotenv: [ .env.{{.ENV | default "test"}} ]`.
-- Running `task dev-*` automatically sets `ENV=dev` and loads `.env.dev`.
-- Running `task test-*` (or default tasks) loads `.env.test`.
-- Running `task prod-*` automatically sets `ENV=prod` and loads `.env.prod`.
+### Layer dependency rule
 
-**Primary Variables:**
-- `DATABASE_URL`: Active database connection used by migrations and the app.
+Dependencies must always flow:
 
-Never commit `.env.prod` or any other file containing real secrets. Use `.env.dev` and `.env.test` for non-sensitive, reproducible configurations.
+```
+interfaces → application → domain
+```
+
+Infrastructure implements domain interfaces but **must never be imported by domain or application directly**.
+
+---
+
+### Repository access
+
+Controllers must **never access repositories directly**.
+
+They must call **application use cases only**.
+
+---
+
+### Database schema
+
+Never modify database structure without creating a **new migration**.
+
+Automatic ORM schema generation is forbidden.
+
+---
+
+### Authentication
+
+All endpoints are **protected by default** using `JwtAuthGuard`.
+
+Endpoints that must be public must explicitly use:
+
+```
+@Public()
+```
+
+---
+
+### Security rules
+
+* Refresh tokens must never be stored in plaintext.
+* Always store **argon2 hash**.
+* Do not log secrets.
+* Never use `console.log` in production code.
+
+---
+
+### Error handling
+
+PostgreSQL errors must be interpreted only through:
+
+```
+PostgresErrorMapper
+```
+
+Do not duplicate SQL error handling logic elsewhere.
+
+---
+
+### Architecture discipline
+
+Never introduce:
+
+* Generic repositories
+* Base controllers
+* Cross-layer shortcuts
+* Premature abstractions
+
+---
+
+### Branching rule
+
+Always start work from the latest `main`.
+
+Never create branches from stale bases.
+
+---
+
+## Important Principle
+
+The architecture intentionally favors:
+
+* **clarity over abstraction**
+* **explicit domain modeling**
+* **strict boundaries**
+* **long-term maintainability**
+
+When in doubt, prefer the **simplest solution that preserves architecture rules**.
