@@ -33,4 +33,11 @@ describe('HealthController (e2e) - GET /health', () => {
     expect(response.body).toHaveProperty('status', 'ok');
     expect(response.body).toHaveProperty('timestamp');
   });
+
+  it('should return 200 OK for database health check', async () => {
+    const response = await request(httpServer).get('/health/db').expect(200);
+
+    expect(response.body).toHaveProperty('status', 'ok');
+    expect(response.body).toHaveProperty('timestamp');
+  });
 });
