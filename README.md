@@ -105,6 +105,18 @@ Implemented and in-progress use cases:
 
 ---
 
+## API Documentation
+
+The core system exposes an interactive API documentation using Swagger. When the application is running, the documentation is available at `/docs`. This allows for exploration of all available endpoints, request schemas, and response types.
+
+---
+
+## Rate Limiting
+
+To ensure stability and protect the system against abuse, the API implements request rate limiting. Using NestJS Throttler, limits are enforced at the HTTP layer, mitigating brute-force attempts and denial-of-service scenarios.
+
+---
+
 ## Documentation
 
 * ADRs (architectural decisions): [`docs/adr`](./docs/adr)
