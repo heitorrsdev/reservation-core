@@ -15,9 +15,18 @@ export class HealthController {
   ) {}
 
   @Public()
-  @Get()
-  async getHealth() {
+  @Get('db')
+  async getDatabaseHealth() {
     await this.db.execute(sql`SELECT 1`);
+    return {
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  @Public()
+  @Get()
+  getHealth() {
     return {
       status: 'ok',
       timestamp: new Date().toISOString(),
